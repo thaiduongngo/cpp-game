@@ -40,31 +40,11 @@ public:
     Pipes();
     void spawnPipe(const float &start, const int &range);
     void movePipes(const float &deltaTime);
-
-    const Pipes_t &getPipes() const
-    {
-        return pipes;
-    }
-
-    const float getPipeSpeed() const
-    {
-        return pipeSpeed;
-    }
-
+    const Pipes_t &getPipes() const;
+    const float getPipeSpeed() const;
     const bool offScreen(const PairPipe_t &pipe) const;
-
-    void erasePipe(const size_t &i)
-    {
-        pipes.erase(pipes.begin() + i);
-        pipes.shrink_to_fit();
-    }
-
-    void reset()
-    {
-        pipes.clear();
-        pipes.shrink_to_fit();
-    }
-
+    void erasePipe(const size_t &i);
+    void reset();
     ~Pipes();
 };
 
@@ -97,9 +77,31 @@ void Pipes::movePipes(const float &deltaTime)
     }
 }
 
+const Pipes_t &Pipes::getPipes() const
+{
+    return pipes;
+}
+
+const float Pipes::getPipeSpeed() const
+{
+    return pipeSpeed;
+}
+
 const bool Pipes::offScreen(const PairPipe_t &pipe) const
 {
     return pipe.first.getPosition().x + pipe.first.getSize().x < 0;
+}
+
+void Pipes::erasePipe(const size_t &i)
+{
+    pipes.erase(pipes.begin() + i);
+    pipes.shrink_to_fit();
+}
+
+void Pipes::reset()
+{
+    pipes.clear();
+    pipes.shrink_to_fit();
 }
 
 Pipes::~Pipes()

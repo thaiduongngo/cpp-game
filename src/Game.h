@@ -45,10 +45,9 @@
 #define TEXT_OUTLINE_COLOR sf::Color::Red
 #endif
 
-class Game
+class Game : public sf::RenderWindow
 {
 private:
-    sf::RenderWindow window;
     CtrChar ctrChar;
     Pipes pipes;
     Clouds clouds;
@@ -72,16 +71,20 @@ private:
     float gravity = 981.f; // Acceleration due to gravity (pixels/s^2)
     float pipeSpawnTimer = 0.f;
     float cloudSpawnTimer = 0.f;
+    void gamePlay();
     void render();
 
 public:
     Game();
     void reset();
     void run();
+    // Events handling
+    void onClose(const sf::Event &event);
+    void onKeyPress(const sf::Event &event);
     ~Game();
 };
 
-Game::Game() : window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), GAME_TITLE),
+Game::Game() : RenderWindow(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), GAME_TITLE),
                ctrChar(),
                pipes(),
                clouds(),
@@ -90,7 +93,7 @@ Game::Game() : window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), GAME_TITLE),
                startText(),
                gameOverText()
 {
-    window.setFramerateLimit(FPS_LIMIT);
+    this->setFramerateLimit(FPS_LIMIT);
 
     ctrChar.setOriginalPosition(sf::Vector2f(100.f, 300.f));
     ctrChar.moveToOriginalPosition();
@@ -138,144 +141,161 @@ void Game::reset()
     clouds.reset();
 }
 
+void Game::gamePlay()
+{
+    float deltaTime = clock.restart().asSeconds();
+
+    if (gameStarted && !gameOver)
+    {
+        // Bird movement
+        ctrChar.moveAndFall(gravity, deltaTime);
+
+        // Cloud spawning
+        cloudSpawnTimer += deltaTime;
+        if (cloudSpawnTimer >= CLOUD_SPAWN_INTERVAL)
+        {
+            cloudSpawnTimer = 0;
+            clouds.spawnCloud(WINDOW_WIDTH, static_cast<int>(WINDOW_HEIGHT));
+        }
+
+        // Move clouds
+        clouds.moveCloud(deltaTime);
+
+        const auto &_clouds = clouds.getClouds();
+        for (int i = 0; i < (*_clouds).size(); i++)
+        {
+            // Remove off-screen clouds
+            if (clouds.offScreen((*(*_clouds)[i])))
+            {
+                clouds.eraseCloud(i);
+                break;
+            }
+        }
+
+        // Pipe spawning
+        pipeSpawnTimer += deltaTime;
+        if (pipeSpawnTimer >= PIPE_SPAWN_INTERVAL)
+        {
+            pipeSpawnTimer = 0;
+            pipes.spawnPipe(WINDOW_WIDTH, static_cast<int>(WINDOW_HEIGHT * 2 / 3));
+        }
+
+        // Move pipes
+        pipes.movePipes(deltaTime);
+
+        // Window edges collision detection
+        gameOver = ctrChar.collidedWEdge(WINDOW_HEIGHT, 0);
+
+        const auto _pipes = pipes.getPipes();
+        for (int i = 0; i < _pipes.size(); i++)
+        {
+            // Pipe collision detection
+            if (!gameOver)
+            {
+                gameOver = ctrChar.collidedWPipe(_pipes[i]);
+            }
+
+            // Score increment
+            if (!gameOver && ctrChar.passedPipe(_pipes[i], pipes.getPipeSpeed(), deltaTime))
+            {
+                score++;
+                scoreText.setString(std::format("Score: {}", score));
+            }
+
+            // Remove off-screen pipes
+            if (pipes.offScreen(_pipes[i]))
+            {
+                pipes.erasePipe(i);
+                break;
+            }
+        }
+
+        if (gameOver)
+            gameStarted = false;
+    }
+}
+
 void Game::render()
 {
-    window.clear();
+    clear();
 
-    window.draw(background, 4, sf::Quads);
+    draw(background, 4, sf::Quads);
 
     for (const auto &cloud : (*clouds.getClouds()))
     {
-        window.draw(*(cloud));
+        draw(*(cloud));
     }
 
     for (const auto &pipePair : pipes.getPipes())
     {
-        window.draw(pipePair.first);
-        window.draw(pipePair.second);
+        draw(pipePair.first);
+        draw(pipePair.second);
     }
 
-    window.draw(ctrChar);
-    window.draw(scoreText);
+    draw(ctrChar);
+    draw(scoreText);
 
     if (!gameStarted)
     {
-        window.draw(startText);
+        draw(startText);
     }
 
     if (gameOver)
     {
-        window.draw(gameOverText);
+        draw(gameOverText);
     }
 
-    window.display();
+    display();
 }
 
 void Game::run()
 {
-    while (window.isOpen())
+    while (isOpen())
     {
+        // Events handling
         sf::Event event;
-        while (window.pollEvent(event))
+        while (pollEvent(event))
         {
-            if (event.type == sf::Event::Closed)
-            {
-                window.close();
-            }
-            // While pressing Spacebar
-            if (event.key.code == sf::Keyboard::Space)
-            {
-                if (gameStarted)
-                {
-                    ctrChar.jump();
-                    flappingSound.play();
-                }
-            }
-
-            if (event.key.code == sf::Keyboard::Enter)
-            {
-                if (!gameStarted)
-                {
-                    gameOver = false;
-                    gameStarted = true;
-                    reset();
-                }
-            }
+            onClose(event);
+            onKeyPress(event);
         }
 
-        float deltaTime = clock.restart().asSeconds();
+        // Game logic
+        gamePlay();
 
-        if (gameStarted && !gameOver)
-        {
-            // Bird movement
-            ctrChar.moveAndFall(gravity, deltaTime);
-
-            // Cloud spawning
-            cloudSpawnTimer += deltaTime;
-            if (cloudSpawnTimer >= CLOUD_SPAWN_INTERVAL)
-            {
-                cloudSpawnTimer = 0;
-                clouds.spawnCloud(WINDOW_WIDTH, static_cast<int>(WINDOW_HEIGHT));
-            }
-
-            // Move clouds
-            clouds.moveCloud(deltaTime);
-
-            const auto &_clouds = clouds.getClouds();
-            for (int i = 0; i < (*_clouds).size(); i++)
-            {
-                // Remove off-screen clouds
-                if (clouds.offScreen((*(*_clouds)[i])))
-                {
-                    clouds.eraseCloud(i);
-                    break;
-                }
-            }
-
-            // Pipe spawning
-            pipeSpawnTimer += deltaTime;
-            if (pipeSpawnTimer >= PIPE_SPAWN_INTERVAL)
-            {
-                pipeSpawnTimer = 0;
-                pipes.spawnPipe(WINDOW_WIDTH, static_cast<int>(WINDOW_HEIGHT * 2 / 3));
-            }
-
-            // Move pipes
-            pipes.movePipes(deltaTime);
-
-            // Window edges collision detection
-            gameOver = ctrChar.collidedWEdge(WINDOW_HEIGHT, 0);
-
-            const auto _pipes = pipes.getPipes();
-            for (int i = 0; i < _pipes.size(); i++)
-            {
-                // Pipe collision detection
-                if (!gameOver)
-                {
-                    gameOver = ctrChar.collidedWPipe(_pipes[i]);
-                }
-
-                // Score increment
-                if (!gameOver && ctrChar.passedPipe(_pipes[i], pipes.getPipeSpeed(), deltaTime))
-                {
-                    score++;
-                    scoreText.setString(std::format("Score: {}", score));
-                }
-
-                // Remove off-screen pipes
-                if (pipes.offScreen(_pipes[i]))
-                {
-                    pipes.erasePipe(i);
-                    break;
-                }
-            }
-
-            if (gameOver)
-                gameStarted = false;
-        }
-
-        // Rendering
+        // Render components
         render();
+    }
+}
+
+void Game::onClose(const sf::Event &event)
+{
+    if (event.type == sf::Event::Closed)
+    {
+        this->close();
+    }
+}
+
+void Game::onKeyPress(const sf::Event &event)
+{
+    if (event.type == sf::Event::KeyPressed)
+    {
+        // While pressing Spacebar
+        if (event.key.code == sf::Keyboard::Space)
+        {
+            if (gameStarted)
+            {
+                ctrChar.jump();
+                flappingSound.play();
+            }
+        }
+
+        if (event.key.code == sf::Keyboard::Enter && !gameStarted)
+        {
+            gameOver = false;
+            gameStarted = true;
+            reset();
+        }
     }
 }
 

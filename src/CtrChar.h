@@ -16,6 +16,7 @@ private:
 
 public:
     CtrChar();
+    const float getVelocity() const;
     void setOriginalPosition(const sf::Vector2f &originalPosition);
     void moveToOriginalPosition();
     void jump();
@@ -23,18 +24,7 @@ public:
     const bool collidedWEdge(const float &top, const float &bottom) const;
     const bool collidedWPipe(const PairPipe_t &pipe) const;
     const bool passedPipe(const PairPipe_t &pipe, const float pipeSpeed, const float deltaTime) const;
-
-    const float getVelocity() const
-    {
-        return velocity;
-    };
-
-    void reset()
-    {
-        moveToOriginalPosition();
-        velocity = 0.f;
-    };
-
+    void reset();
     ~CtrChar();
 };
 
@@ -45,6 +35,11 @@ CtrChar::CtrChar() : image(), texture()
     texture.loadFromImage(this->image);
     setTexture(this->texture);
 }
+
+const float CtrChar::getVelocity() const
+{
+    return velocity;
+};
 
 void CtrChar::setOriginalPosition(const sf::Vector2f &originalPosition)
 {
@@ -82,6 +77,12 @@ const bool CtrChar::passedPipe(const PairPipe_t &pipe, const float pipeSpeed, co
 void CtrChar::moveToOriginalPosition()
 {
     setPosition(originalPosition);
+}
+
+void CtrChar::reset()
+{
+    moveToOriginalPosition();
+    velocity = 0.f;
 }
 
 CtrChar::~CtrChar()

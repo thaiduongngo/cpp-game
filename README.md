@@ -1,4 +1,6 @@
 # Installation
+## Prerequisites
+C++ compiler such as G++ must be installed in your computer.
 ## Install CMake
 https://cmake.org/download/
 ## Install SFML

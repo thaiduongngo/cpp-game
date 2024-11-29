@@ -2,76 +2,77 @@
 #include <SFML/Graphics.hpp>
 #include "Cloud.h"
 
-#ifndef CLOUD_SPEED
-#define CLOUD_SPEED -150.f
-#endif
+constexpr auto CLOUD_SPEED = -100.f;
+constexpr auto CLOUD_IMAGE = "./res/cloud.png";
 
-typedef std::vector<std::unique_ptr<Cloud>> Clouds_t;
+typedef std::vector<Cloud> Clouds_t;
 
 class Clouds
 {
 private:
-    std::unique_ptr<Clouds_t> clouds;
-    sf::Image image;
-    sf::Texture texture;
+    Clouds_t clouds;
+    sf::Texture texture_;
 
 public:
     Clouds();
     void spawnCloud(const float &start, const int &height);
     void moveCloud(const float &deltaTime);
-    const std::unique_ptr<Clouds_t> &getClouds();
-    const bool offScreen(const Cloud &cloud) const;
-    void eraseCloud(const size_t &i);
+    const Clouds_t &getClouds() const;
+    const bool offScreen(const size_t &i) const;
+    void eraseOffScreenCloud();
     void reset();
     ~Clouds();
 };
 
-Clouds::Clouds()
+Clouds::Clouds() : clouds(), texture_()
 {
-    clouds = std::make_unique<Clouds_t>();
     // @todo handle error no file found here
-    image.loadFromFile("./res/cloud.png");
-    texture.loadFromImage(image);
+    texture_.loadFromFile(CLOUD_IMAGE);
+    texture_.setSmooth(true);
 };
 
 void Clouds::spawnCloud(const float &start, const int &height)
 {
     const float yPosition = static_cast<float>(abs(std::rand()) % height); // Randomize cloud position
-    auto cloud = std::make_unique<Cloud>(texture);
-    cloud->setPosition(start, yPosition);
-    (*clouds).push_back(std::move(cloud));
+    auto cloud = Cloud(texture_);
+    cloud.setPosition(start, yPosition);
+    clouds.push_back(std::move(cloud));
 }
 
 void Clouds::moveCloud(const float &deltaTime)
 {
-    for (auto &cloud : *(clouds))
+    for (auto &cloud : clouds)
     {
-        cloud->move(CLOUD_SPEED * deltaTime, 0);
+        cloud.move(CLOUD_SPEED * deltaTime, 0);
     }
 }
 
-const std::unique_ptr<Clouds_t> &Clouds::getClouds()
+const Clouds_t &Clouds::getClouds() const
 {
     return clouds;
 }
 
-const bool Clouds::offScreen(const Cloud &cloud) const
+const bool Clouds::offScreen(const size_t &i) const
 {
-    return cloud.getPosition().x + cloud.getTextureRect().getSize().x < 0;
+    return clouds[i].getPosition().x + clouds[i].getTextureRect().getSize().x < 0;
 }
 
-void Clouds::eraseCloud(const size_t &i)
+void Clouds::eraseOffScreenCloud()
 {
-    (*clouds).erase((*clouds).begin() + i);
-    (*clouds).shrink_to_fit();
+    for (int i = 0; i < clouds.size(); i++)
+    {
+        if (offScreen(i))
+        {
+            clouds.erase(clouds.begin() + i);
+            clouds = Clouds_t(std::move(clouds));
+        }
+    }
 }
 
 void Clouds::reset()
 {
-    (*clouds).clear();
-    (*clouds).shrink_to_fit();
+    clouds.clear();
+    clouds = Clouds_t(std::move(clouds));
 }
 
-Clouds::~Clouds()
-{
-}
+Clouds::~Clouds() {}

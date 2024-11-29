@@ -2,22 +2,22 @@
 #include <SFML/Graphics.hpp>
 #include "Pipes.h"
 
-#ifndef JUPMP_DISTANCE
-#define JUPMP_DISTANCE -400.f
+constexpr auto JUPMP_DISTANCE = -400.f;
+constexpr auto CHAR_IMAGE = "./res/dragon.png";
+
+#ifndef CHAR_ORG_POSITION
+#define CHAR_ORG_POSITION sf::Vector2f(100.f, 300.f)
 #endif
 
 class CtrChar : public sf::Sprite
 {
 private:
-    sf::Image image;
-    sf::Texture texture;
-    sf::Vector2f originalPosition;
+    sf::Texture texture_;
     float velocity = 0.f;
 
 public:
     CtrChar();
     const float getVelocity() const;
-    void setOriginalPosition(const sf::Vector2f &originalPosition);
     void moveToOriginalPosition();
     void jump();
     void moveAndFall(const float &gravity, const float &deltaTime);
@@ -28,22 +28,17 @@ public:
     ~CtrChar();
 };
 
-CtrChar::CtrChar() : image(), texture()
+CtrChar::CtrChar() : texture_()
 {
     // @todo handle error no file found here
-    image.loadFromFile("./res/dragon.png");
-    texture.loadFromImage(this->image);
-    setTexture(this->texture);
+    texture_.loadFromFile(CHAR_IMAGE);
+    texture_.setSmooth(true);
+    setTexture(texture_);
 }
 
 const float CtrChar::getVelocity() const
 {
     return velocity;
-};
-
-void CtrChar::setOriginalPosition(const sf::Vector2f &originalPosition)
-{
-    this->originalPosition = originalPosition;
 }
 
 void CtrChar::jump()
@@ -76,7 +71,7 @@ const bool CtrChar::passedPipe(const PairPipe_t &pipe, const float pipeSpeed, co
 
 void CtrChar::moveToOriginalPosition()
 {
-    setPosition(originalPosition);
+    setPosition(CHAR_ORG_POSITION);
 }
 
 void CtrChar::reset()
@@ -85,6 +80,4 @@ void CtrChar::reset()
     velocity = 0.f;
 }
 
-CtrChar::~CtrChar()
-{
-}
+CtrChar::~CtrChar() {}

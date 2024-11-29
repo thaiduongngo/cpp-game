@@ -4,15 +4,13 @@
 class Cloud : public sf::Sprite
 {
 public:
-    Cloud(sf::Texture &texture);
+    Cloud(const sf::Texture &texture);
     ~Cloud();
 };
 
-Cloud::Cloud(sf::Texture &texture)
+Cloud::Cloud(const sf::Texture &texture)
 {
     setTexture(texture);
 }
 
-Cloud::~Cloud()
-{
-}
+Cloud::~Cloud() {}

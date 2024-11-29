@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
+#include <string>
 #include <ctime>
 #include <format>
 #include <iostream>
@@ -8,34 +9,15 @@
 #include "Pipes.h"
 #include "Cloud.h"
 #include "Clouds.h"
+#include "Leaderboard.h"
 
-#ifndef GAME_TITLE
-#define GAME_TITLE "Dragon Quest"
-#endif
-
-#ifndef WINDOW_WIDTH
-#define WINDOW_WIDTH 1024
-#endif
-
-#ifndef WINDOW_HEIGHT
-#define WINDOW_HEIGHT 768
-#endif
-
-#ifndef FONT_SIZE
-#define FONT_SIZE 35
-#endif
-
-#ifndef FPS_LIMIT
-#define FPS_LIMIT 60
-#endif
-
-#ifndef PIPE_SPAWN_INTERVAL
-#define PIPE_SPAWN_INTERVAL 1.6f
-#endif
-
-#ifndef CLOUD_SPAWN_INTERVAL
-#define CLOUD_SPAWN_INTERVAL 1.5f
-#endif
+constexpr std::string GAME_TITLE = "Dragon Quest";
+constexpr auto WINDOW_WIDTH = 1024.f;
+constexpr auto WINDOW_HEIGHT = 768.f;
+constexpr auto FONT_SIZE = 35;
+constexpr auto FPS_LIMIT = 60;
+constexpr auto PIPE_SPAWN_INTERVAL = 1.75f;
+constexpr auto CLOUD_SPAWN_INTERVAL = 1.5f;
 
 #ifndef TEXT_COLOR
 #define TEXT_COLOR sf::Color::Yellow
@@ -55,13 +37,9 @@ private:
     sf::Text scoreText;
     sf::Text startText;
     sf::Text gameOverText;
+    sf::Text leaderboardText;
+    Leaderboard leaderboard;
     sf::Clock clock;
-    sf::Vertex background[4] = {
-        sf::Vertex(sf::Vector2f(0, 0), sf::Color::Cyan),
-        sf::Vertex(sf::Vector2f(0, WINDOW_HEIGHT), sf::Color::Blue),
-        sf::Vertex(sf::Vector2f(WINDOW_WIDTH, WINDOW_HEIGHT), sf::Color::Blue),
-        sf::Vertex(sf::Vector2f(WINDOW_WIDTH, 0), sf::Color::Cyan),
-    };
     sf::SoundBuffer flappingSoundBuffer;
     sf::Sound flappingSound;
 
@@ -91,13 +69,11 @@ Game::Game() : RenderWindow(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), GAME_TIT
                font(),
                scoreText(),
                startText(),
-               gameOverText()
+               gameOverText(),
+               leaderboardText(),
+               leaderboard()
 {
     this->setFramerateLimit(FPS_LIMIT);
-
-    ctrChar.setOriginalPosition(sf::Vector2f(100.f, 300.f));
-    ctrChar.moveToOriginalPosition();
-
     // @todo handle error here
     font.loadFromFile("./res/FiraCode.ttf");
     flappingSoundBuffer.loadFromFile("./res/dragon.mp3");
@@ -128,6 +104,15 @@ Game::Game() : RenderWindow(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), GAME_TIT
     gameOverText.setOutlineColor(sf::Color::Yellow);
     gameOverText.setOrigin(gameOverText.getLocalBounds().width / 2, gameOverText.getLocalBounds().height / 2);
     gameOverText.setPosition(WINDOW_WIDTH / 2, 400);
+    // Leaderboard
+    leaderboardText.setFont(font);
+    leaderboardText.setCharacterSize(FONT_SIZE);
+    leaderboardText.setFillColor(sf::Color::Yellow);
+    leaderboardText.setOutlineThickness(1.f);
+    leaderboardText.setOutlineColor(sf::Color::Black);
+    leaderboardText.setOrigin(leaderboardText.getLocalBounds().width / 2, leaderboardText.getLocalBounds().height / 2);
+    leaderboardText.setPosition(WINDOW_WIDTH / 5, 500);
+    reset();
 };
 
 void Game::reset()
@@ -145,7 +130,7 @@ void Game::gamePlay()
 {
     float deltaTime = clock.restart().asSeconds();
 
-    if (gameStarted && !gameOver)
+    if (gameStarted && !gameOver) // Game is playing
     {
         // Bird movement
         ctrChar.moveAndFall(gravity, deltaTime);
@@ -160,17 +145,7 @@ void Game::gamePlay()
 
         // Move clouds
         clouds.moveCloud(deltaTime);
-
-        const auto &_clouds = clouds.getClouds();
-        for (int i = 0; i < (*_clouds).size(); i++)
-        {
-            // Remove off-screen clouds
-            if (clouds.offScreen((*(*_clouds)[i])))
-            {
-                clouds.eraseCloud(i);
-                break;
-            }
-        }
+        clouds.eraseOffScreenCloud();
 
         // Pipe spawning
         pipeSpawnTimer += deltaTime;
@@ -186,50 +161,56 @@ void Game::gamePlay()
         // Window edges collision detection
         gameOver = ctrChar.collidedWEdge(WINDOW_HEIGHT, 0);
 
-        const auto _pipes = pipes.getPipes();
-        for (int i = 0; i < _pipes.size(); i++)
+        const auto &pipes_ = pipes.getPipes();
+        for (int i = 0; i < pipes_.size(); i++)
         {
             // Pipe collision detection
             if (!gameOver)
             {
-                gameOver = ctrChar.collidedWPipe(_pipes[i]);
+                gameOver = ctrChar.collidedWPipe(pipes_[i]);
             }
 
             // Score increment
-            if (!gameOver && ctrChar.passedPipe(_pipes[i], pipes.getPipeSpeed(), deltaTime))
+            if (!gameOver && ctrChar.passedPipe(pipes_[i], pipes.getPipeSpeed(), deltaTime))
             {
                 score++;
                 scoreText.setString(std::format("Score: {}", score));
             }
 
-            // Remove off-screen pipes
-            if (pipes.offScreen(_pipes[i]))
-            {
-                pipes.erasePipe(i);
-                break;
-            }
+            pipes.eraseOffScreenPipe(i);
         }
 
         if (gameOver)
+        {
             gameStarted = false;
+            leaderboard.addEntry(score);
+            leaderboard.saveToFile();
+            leaderboardText.setString(leaderboard.getLeaderboard());
+        }
     }
 }
 
 void Game::render()
 {
     clear();
+    const sf::Vertex wnd_background[4] = {
+        sf::Vertex(sf::Vector2f(0, 0), sf::Color::Cyan),
+        sf::Vertex(sf::Vector2f(0, WINDOW_HEIGHT), sf::Color::Blue),
+        sf::Vertex(sf::Vector2f(WINDOW_WIDTH, WINDOW_HEIGHT), sf::Color::Blue),
+        sf::Vertex(sf::Vector2f(WINDOW_WIDTH, 0), sf::Color::Cyan),
+    };
 
-    draw(background, 4, sf::Quads);
+    draw(wnd_background, 4, sf::PrimitiveType::Quads);
 
-    for (const auto &cloud : (*clouds.getClouds()))
+    for (const auto &cloud : clouds.getClouds())
     {
-        draw(*(cloud));
+        draw(cloud);
     }
 
     for (const auto &pipePair : pipes.getPipes())
     {
-        draw(pipePair.first);
-        draw(pipePair.second);
+        draw((pipePair).first);
+        draw((pipePair).second);
     }
 
     draw(ctrChar);
@@ -243,6 +224,7 @@ void Game::render()
     if (gameOver)
     {
         draw(gameOverText);
+        draw(leaderboardText);
     }
 
     display();
@@ -272,7 +254,7 @@ void Game::onClose(const sf::Event &event)
 {
     if (event.type == sf::Event::Closed)
     {
-        this->close();
+        close();
     }
 }
 
@@ -280,23 +262,29 @@ void Game::onKeyPress(const sf::Event &event)
 {
     if (event.type == sf::Event::KeyPressed)
     {
-        // While pressing Spacebar
-        if (event.key.code == sf::Keyboard::Space)
+        switch (event.key.code)
         {
+        case sf::Keyboard::Space:
             if (gameStarted)
             {
+                // WHile game playing
                 ctrChar.jump();
                 flappingSound.play();
             }
-        }
-
-        if (event.key.code == sf::Keyboard::Enter && !gameStarted)
-        {
-            gameOver = false;
-            gameStarted = true;
-            reset();
+            break;
+        case sf::Keyboard::Enter:
+            if (!gameStarted)
+            {
+                // Restart a new game
+                gameOver = false;
+                gameStarted = true;
+                reset();
+            }
+            break;
+        default:
+            break;
         }
     }
 }
 
-Game::~Game() {};
+Game::~Game() {}

@@ -13,6 +13,7 @@
 constexpr std::string LEADERBOARD_FILE = "leaderboard.txt";
 constexpr auto LEADERBOARD_SIZE = 5;
 constexpr char DELIMITER = ',';
+constexpr int STRING_LENGTH = 6;
 
 class Leaderboard
 {
@@ -25,7 +26,7 @@ public:
     void loadFromFile();
     void saveToFile();
     bool isTopScore(const int &score) const;
-    void addEntry(const int &score);
+    void addEntry(const std::string &name, const int &score);
     const std::string getLeaderboard() const;
     std::vector<LeaderboardEntry> getEntries() const;
 };
@@ -40,19 +41,21 @@ void Leaderboard::loadFromFile()
     std::ifstream file(LEADERBOARD_FILE);
     if (file.is_open())
     {
+        entries_.clear();
         std::string line;
         while (std::getline(file, line))
         {
             std::stringstream ss(line);
             std::string name, timestampStr, scoreStr;
-            if (std::getline(ss, timestampStr, DELIMITER) &&
+            if (std::getline(ss, name, DELIMITER) &&
+                std::getline(ss, timestampStr, DELIMITER) &&
                 std::getline(ss, scoreStr, DELIMITER))
             {
                 try
                 {
                     time_t timestamp = std::stoll(timestampStr);
                     int score = std::stoi(scoreStr);
-                    entries_.push_back({timestamp, score});
+                    entries_.push_back({name, timestamp, score});
                 }
                 catch (const std::invalid_argument &e)
                 {
@@ -73,7 +76,7 @@ void Leaderboard::saveToFile()
     {
         for (const auto &entry : entries_)
         {
-            file << entry.timestamp << DELIMITER << entry.score << "\n";
+            file << entry.name << DELIMITER << entry.timestamp << DELIMITER << entry.score << "\n";
         }
         file.close();
     }
@@ -92,11 +95,13 @@ bool Leaderboard::isTopScore(const int &score) const
     return score > entries_.back().score;
 }
 
-void Leaderboard::addEntry(const int &score)
+void Leaderboard::addEntry(const std::string &name, const int &score)
 {
     if (isTopScore(score))
     {
-        entries_.push_back({std::time(0), score});
+        std::string name_ = name;
+        name_.insert(name_.end(), STRING_LENGTH - name_.size(), ' ');
+        entries_.push_back({name_, std::time(0), score});
         std::sort(entries_.begin(), entries_.end());
         if (entries_.size() > LEADERBOARD_SIZE)
         {
@@ -113,9 +118,11 @@ const std::string Leaderboard::getLeaderboard() const
     {
         const auto &entry = entries_[i];
         char strBuffer[100];
-        std::strftime(strBuffer, sizeof(strBuffer), "%Y-%m-%d %H:%M:%S", std::localtime(&entry.timestamp));
-        const std::string str(strBuffer);
-        const std::string strRec = std::format("#{}  {}  {}\n", i + 1, str, std::to_string(entry.score));
+        std::strftime(strBuffer, sizeof(strBuffer), "%m-%d %H:%M:%S", std::localtime(&entry.timestamp));
+        const std::string strTime(strBuffer);
+        std::string strScore = std::to_string(entry.score);
+        strScore.insert(strScore.begin(), STRING_LENGTH - strScore.size(), ' ');
+        const std::string strRec = std::format("#{}  {}  {}  {}\n", i + 1, entry.name, strTime, strScore);
         strLeaderboard += strRec;
     }
     return strLeaderboard;

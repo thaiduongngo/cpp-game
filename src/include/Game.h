@@ -13,11 +13,13 @@
 #include "Cloud.h"
 #include "Clouds.h"
 #include "Leaderboard.h"
+#include "GameState.h"
 
 constexpr std::string GAME_TITLE = "Dragon Quest";
 constexpr auto WINDOW_WIDTH = 1024.f;
 constexpr auto WINDOW_HEIGHT = 768.f;
-constexpr auto FONT_SIZE = 35;
+constexpr auto CHAR_SIZE_HEADER = 35;
+constexpr auto CHAR_SIZE_DETAIL = 25;
 constexpr auto FPS_LIMIT = 60;
 constexpr auto PIPE_SPAWN_INTERVAL = 1.75f;
 constexpr auto CLOUD_SPAWN_INTERVAL = 1.5f;
@@ -43,16 +45,17 @@ private:
     sf::Text startText;
     sf::Text gameOverText;
     sf::Text leaderboardText;
+    sf::Text highScore;
+    sf::Text playerName;
+    sf::String playerString;
     sf::RectangleShape panelLeaderboard;
     sf::Clock clock;
     sf::SoundBuffer flappingSoundBuffer;
     sf::Sound flappingSound;
     sf::SoundBuffer gameOverSoundBuffer;
     sf::Sound gameOverSound;
-
+    GameState gameState = GameState::NOT_STARTED;
     int score = 0;
-    bool gameStarted = false;
-    bool gameOver = false;
     float gravity = 981.f; // Acceleration due to gravity (pixels/s^2)
     float pipeSpawnTimer = 0.f;
     float cloudSpawnTimer = 0.f;
@@ -66,6 +69,7 @@ public:
     // Events handling
     void onClose(const sf::Event &event);
     void onKeyPress(const sf::Event &event);
+    void onTextEntered(const sf::Event &event);
     ~Game();
 };
 
@@ -76,6 +80,7 @@ Game::Game() : RenderWindow(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), GAME_TIT
                leaderboard()
 {
     this->setFramerateLimit(FPS_LIMIT);
+    leaderboard.loadFromFile();
     // @todo handle error here
     font.loadFromFile("./res/FiraCode.ttf");
     flappingSoundBuffer.loadFromFile("./res/dragon.mp3");
@@ -85,7 +90,7 @@ Game::Game() : RenderWindow(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), GAME_TIT
     // Score text
     scoreText.setString(std::format("Score: {}", score));
     scoreText.setFont(font);
-    scoreText.setCharacterSize(FONT_SIZE);
+    scoreText.setCharacterSize(CHAR_SIZE_HEADER);
     scoreText.setFillColor(TEXT_COLOR);
     scoreText.setOutlineThickness(1.f);
     scoreText.setOutlineColor(TEXT_OUTLINE_COLOR);
@@ -93,7 +98,7 @@ Game::Game() : RenderWindow(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), GAME_TIT
     // Start text
     startText.setString("Press Enter to Start");
     startText.setFont(font);
-    startText.setCharacterSize(FONT_SIZE);
+    startText.setCharacterSize(CHAR_SIZE_HEADER);
     startText.setFillColor(TEXT_COLOR);
     startText.setOutlineThickness(1.f);
     startText.setOutlineColor(TEXT_OUTLINE_COLOR);
@@ -102,25 +107,43 @@ Game::Game() : RenderWindow(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), GAME_TIT
     // Gameover text
     gameOverText.setString("Game Over!");
     gameOverText.setFont(font);
-    gameOverText.setCharacterSize(FONT_SIZE);
+    gameOverText.setCharacterSize(CHAR_SIZE_HEADER);
     gameOverText.setFillColor(sf::Color::Red);
     gameOverText.setOutlineThickness(1.f);
     gameOverText.setOutlineColor(sf::Color::Yellow);
     gameOverText.setOrigin(gameOverText.getLocalBounds().width / 2, gameOverText.getLocalBounds().height / 2);
     gameOverText.setPosition(WINDOW_WIDTH / 2, 300);
     // Leaderboard
-    panelLeaderboard = sf::RectangleShape(sf::Vector2f(WINDOW_WIDTH * 0.8, WINDOW_HEIGHT * 0.42));
+    panelLeaderboard = sf::RectangleShape(sf::Vector2f(WINDOW_WIDTH * 0.8, WINDOW_HEIGHT * 0.45));
     panelLeaderboard.setOutlineThickness(1.f);
     panelLeaderboard.setOutlineColor(sf::Color::Yellow);
     panelLeaderboard.setFillColor(sf::Color::Black);
     panelLeaderboard.setPosition(WINDOW_WIDTH * 0.1, 350);
     leaderboardText.setFont(font);
-    leaderboardText.setCharacterSize(FONT_SIZE);
+    leaderboardText.setCharacterSize(CHAR_SIZE_HEADER);
     leaderboardText.setFillColor(sf::Color::Yellow);
     leaderboardText.setOutlineThickness(1.f);
     leaderboardText.setOutlineColor(sf::Color::Black);
     leaderboardText.setOrigin(leaderboardText.getLocalBounds().width / 2, leaderboardText.getLocalBounds().height / 2);
-    leaderboardText.setPosition(WINDOW_WIDTH * 0.2, 400);
+    leaderboardText.setPosition(WINDOW_WIDTH * 0.15, 400);
+    // High score
+    highScore.setString("High score! Enter your name: ");
+    highScore.setFont(font);
+    highScore.setCharacterSize(CHAR_SIZE_DETAIL);
+    highScore.setFillColor(sf::Color::White);
+    highScore.setOutlineThickness(1.f);
+    highScore.setOutlineColor(sf::Color::Blue);
+    highScore.setOrigin(playerName.getLocalBounds().width / 2, playerName.getLocalBounds().height / 2);
+    highScore.setPosition(WINDOW_WIDTH * 0.15, 640);
+    // Player name
+    playerName.setFont(font);
+    playerName.setCharacterSize(CHAR_SIZE_DETAIL);
+    playerName.setFillColor(sf::Color::White);
+    playerName.setOutlineThickness(1.f);
+    playerName.setOutlineColor(sf::Color::Blue);
+    playerName.setStyle(sf::Text::Bold);
+    playerName.setOrigin(playerName.getLocalBounds().width / 2, playerName.getLocalBounds().height / 2);
+    playerName.setPosition(WINDOW_WIDTH * 0.57, 640);
     reset();
 };
 
@@ -139,7 +162,7 @@ void Game::gamePlay()
 {
     float deltaTime = clock.restart().asSeconds();
 
-    if (gameStarted && !gameOver) // Game is playing
+    if (gameState == GameState::PLAYING) // Game is playing
     {
         // Bird movement
         ctrChar.moveAndFall(gravity, deltaTime);
@@ -168,15 +191,22 @@ void Game::gamePlay()
         pipes.movePipes(deltaTime);
 
         // Window edges collision detection
-        gameOver = ctrChar.collidedWEdge(WINDOW_HEIGHT, 0);
+        if (ctrChar.collidedWEdge(WINDOW_HEIGHT, 0))
+        {
+            gameState = GameState::GAMEOVER;
+        }
 
         const auto &pipes_ = pipes.getPipes();
         for (int i = 0; i < pipes_.size(); i++)
         {
             // Pipe collision detection
-            if (!gameOver)
+            if (gameState != GameState::GAMEOVER && gameState != GameState::TOP_GAMEOVER)
             {
-                gameOver = ctrChar.collidedWPipe(pipes_[i]);
+                if (ctrChar.collidedWPipe(pipes_[i]))
+                {
+                    gameState = GameState::GAMEOVER;
+                }
+
                 if (ctrChar.passedPipe(pipes_[i], pipes.getPipeSpeed(), deltaTime))
                 {
                     // Score increment
@@ -188,13 +218,105 @@ void Game::gamePlay()
             pipes.eraseOffScreenPipe(i);
         }
 
-        if (gameOver)
+        // Gameover
+        if (gameState == GameState::GAMEOVER)
         {
             gameOverSound.play();
-            gameStarted = false;
-            leaderboard.addEntry(score);
-            leaderboard.saveToFile();
+
+            if (leaderboard.isTopScore(score))
+            {
+                gameState = GameState::TOP_GAMEOVER;
+            }
             leaderboardText.setString(leaderboard.getLeaderboard());
+        }
+    }
+}
+
+void Game::run()
+{
+    while (isOpen())
+    {
+        // Events handling
+        sf::Event event;
+        while (pollEvent(event))
+        {
+            onClose(event);
+            onKeyPress(event);
+            if (gameState == GameState::TOP_GAMEOVER)
+                onTextEntered(event);
+        }
+
+        // Game logic
+        gamePlay();
+
+        // Render components
+        render();
+    }
+}
+
+void Game::onClose(const sf::Event &event)
+{
+    if (event.type == sf::Event::Closed)
+    {
+        close();
+    }
+}
+
+void Game::onKeyPress(const sf::Event &event)
+{
+    if (event.type == sf::Event::KeyPressed)
+    {
+        switch (event.key.code)
+        {
+        case sf::Keyboard::Space:
+            if (gameState == GameState::PLAYING)
+            {
+                // While game playing
+                ctrChar.jump();
+                flappingSound.play();
+            }
+            break;
+        case sf::Keyboard::Enter:
+            if (gameState == GameState::TOP_GAMEOVER)
+            {
+                leaderboard.addEntry(playerString, score);
+                leaderboardText.setString(leaderboard.getLeaderboard());
+                playerString = "";
+                playerName.setString(playerString);
+                gameState = GameState::GAMEOVER;
+            }
+            else if (gameState != GameState::PLAYING)
+            {
+                // Restart a new game
+                gameState = GameState::PLAYING;
+                reset();
+            }
+            break;
+        default:
+            break;
+        }
+    }
+}
+
+void Game::onTextEntered(const sf::Event &event)
+{
+    if (event.type == sf::Event::TextEntered)
+    {
+        if (event.text.unicode == '\b')
+        {
+            if (playerString.getSize() > 0)
+            {
+                playerString.erase(playerString.getSize() - 1, 1);
+                playerName.setString(playerString);
+            }
+        }
+        else
+        {
+            if (playerString.getSize() < 6)
+            {
+                playerString += event.text.unicode;
+                playerName.setString(playerString);
+            }
         }
     }
 }
@@ -225,76 +347,24 @@ void Game::render()
     draw(ctrChar);
     draw(scoreText);
 
-    if (!gameStarted)
+    if (gameState != GameState::PLAYING)
     {
         draw(startText);
     }
 
-    if (gameOver)
+    if (gameState == GameState::GAMEOVER || gameState == GameState::TOP_GAMEOVER)
     {
         draw(gameOverText);
         draw(panelLeaderboard);
         draw(leaderboardText);
+        if (gameState == GameState::TOP_GAMEOVER)
+        {
+            draw(highScore);
+            draw(playerName);
+        }
     }
 
     display();
-}
-
-void Game::run()
-{
-    while (isOpen())
-    {
-        // Events handling
-        sf::Event event;
-        while (pollEvent(event))
-        {
-            onClose(event);
-            onKeyPress(event);
-        }
-
-        // Game logic
-        gamePlay();
-
-        // Render components
-        render();
-    }
-}
-
-void Game::onClose(const sf::Event &event)
-{
-    if (event.type == sf::Event::Closed)
-    {
-        close();
-    }
-}
-
-void Game::onKeyPress(const sf::Event &event)
-{
-    if (event.type == sf::Event::KeyPressed)
-    {
-        switch (event.key.code)
-        {
-        case sf::Keyboard::Space:
-            if (gameStarted)
-            {
-                // WHile game playing
-                ctrChar.jump();
-                flappingSound.play();
-            }
-            break;
-        case sf::Keyboard::Enter:
-            if (!gameStarted)
-            {
-                // Restart a new game
-                gameOver = false;
-                gameStarted = true;
-                reset();
-            }
-            break;
-        default:
-            break;
-        }
-    }
 }
 
 Game::~Game() {}

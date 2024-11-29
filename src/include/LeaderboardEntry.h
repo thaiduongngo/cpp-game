@@ -4,6 +4,7 @@
 
 struct LeaderboardEntry
 {
+    std::string name;
     time_t timestamp;
     int score;
 

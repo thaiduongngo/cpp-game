@@ -44,3 +44,4 @@ cmake_install.cmake
 Makefile
 
 leaderboard.txt
+leaderboard.dat

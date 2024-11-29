@@ -23,7 +23,7 @@ public:
     void moveAndFall(const float &gravity, const float &deltaTime);
     const bool collidedWEdge(const float &top, const float &bottom) const;
     const bool collidedWPipe(const PairPipe_t &pipe) const;
-    const bool passedPipe(const PairPipe_t &pipe, const float pipeSpeed, const float deltaTime) const;
+    const bool passedPipe(const PairPipe_t &pipe, const float &pipeSpeed, const float &deltaTime) const;
     void reset();
     ~CtrChar();
 };
@@ -64,7 +64,7 @@ const bool CtrChar::collidedWPipe(const PairPipe_t &pipe) const
            getGlobalBounds().intersects(pipe.second.getGlobalBounds());
 }
 
-const bool CtrChar::passedPipe(const PairPipe_t &pipe, const float pipeSpeed, const float deltaTime) const
+const bool CtrChar::passedPipe(const PairPipe_t &pipe, const float &pipeSpeed, const float &deltaTime) const
 {
     return pipe.first.getPosition().x + pipe.first.getSize().x < getPosition().x && pipe.first.getPosition().x + pipe.first.getSize().x > getPosition().x + pipeSpeed * deltaTime;
 }

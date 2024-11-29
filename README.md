@@ -1,4 +1,5 @@
 ![alt text](DragonQuest.png "Dragon Quest")
+![alt text](DQ-GameOver.png "Dragon Quest")
 # Installation
 ## Prerequisites
 C++ compiler such as G++ must be installed in your computer.

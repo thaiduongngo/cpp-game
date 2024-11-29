@@ -47,6 +47,8 @@ private:
     sf::Clock clock;
     sf::SoundBuffer flappingSoundBuffer;
     sf::Sound flappingSound;
+    sf::SoundBuffer gameOverSoundBuffer;
+    sf::Sound gameOverSound;
 
     int score = 0;
     bool gameStarted = false;
@@ -78,6 +80,8 @@ Game::Game() : RenderWindow(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), GAME_TIT
     font.loadFromFile("./res/FiraCode.ttf");
     flappingSoundBuffer.loadFromFile("./res/dragon.mp3");
     flappingSound.setBuffer(flappingSoundBuffer);
+    gameOverSoundBuffer.loadFromFile("./res/gameover.mp3");
+    gameOverSound.setBuffer(gameOverSoundBuffer);
     // Score text
     scoreText.setString(std::format("Score: {}", score));
     scoreText.setFont(font);
@@ -173,13 +177,12 @@ void Game::gamePlay()
             if (!gameOver)
             {
                 gameOver = ctrChar.collidedWPipe(pipes_[i]);
-            }
-
-            // Score increment
-            if (!gameOver && ctrChar.passedPipe(pipes_[i], pipes.getPipeSpeed(), deltaTime))
-            {
-                score++;
-                scoreText.setString(std::format("Score: {}", score));
+                if (ctrChar.passedPipe(pipes_[i], pipes.getPipeSpeed(), deltaTime))
+                {
+                    // Score increment
+                    score++;
+                    scoreText.setString(std::format("Score: {}", score));
+                }
             }
 
             pipes.eraseOffScreenPipe(i);
@@ -187,6 +190,7 @@ void Game::gamePlay()
 
         if (gameOver)
         {
+            gameOverSound.play();
             gameStarted = false;
             leaderboard.addEntry(score);
             leaderboard.saveToFile();

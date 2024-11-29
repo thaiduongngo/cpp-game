@@ -115,7 +115,7 @@ const std::string Leaderboard::getLeaderboard() const
         char strBuffer[100];
         std::strftime(strBuffer, sizeof(strBuffer), "%Y-%m-%d %H:%M:%S", std::localtime(&entry.timestamp));
         const std::string str(strBuffer);
-        const std::string strRec = std::format("#{}.  {}  {}\n", i + 1, str, std::to_string(entry.score));
+        const std::string strRec = std::format("#{}  {}  {}\n", i + 1, str, std::to_string(entry.score));
         strLeaderboard += strRec;
     }
     return strLeaderboard;

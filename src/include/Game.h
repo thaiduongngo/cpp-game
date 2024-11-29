@@ -1,4 +1,7 @@
 #pragma once
+#ifndef _GAME_H_
+#define _GAME_H_
+
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include <string>
@@ -33,12 +36,14 @@ private:
     CtrChar ctrChar;
     Pipes pipes;
     Clouds clouds;
+    Leaderboard leaderboard;
+
     sf::Font font;
     sf::Text scoreText;
     sf::Text startText;
     sf::Text gameOverText;
     sf::Text leaderboardText;
-    Leaderboard leaderboard;
+    sf::RectangleShape panelLeaderboard;
     sf::Clock clock;
     sf::SoundBuffer flappingSoundBuffer;
     sf::Sound flappingSound;
@@ -66,11 +71,6 @@ Game::Game() : RenderWindow(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), GAME_TIT
                ctrChar(),
                pipes(),
                clouds(),
-               font(),
-               scoreText(),
-               startText(),
-               gameOverText(),
-               leaderboardText(),
                leaderboard()
 {
     this->setFramerateLimit(FPS_LIMIT);
@@ -94,7 +94,7 @@ Game::Game() : RenderWindow(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), GAME_TIT
     startText.setOutlineThickness(1.f);
     startText.setOutlineColor(TEXT_OUTLINE_COLOR);
     startText.setOrigin(startText.getLocalBounds().width / 2, startText.getLocalBounds().height / 2);
-    startText.setPosition(WINDOW_WIDTH / 2, 300);
+    startText.setPosition(WINDOW_WIDTH / 2, 250);
     // Gameover text
     gameOverText.setString("Game Over!");
     gameOverText.setFont(font);
@@ -103,15 +103,20 @@ Game::Game() : RenderWindow(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), GAME_TIT
     gameOverText.setOutlineThickness(1.f);
     gameOverText.setOutlineColor(sf::Color::Yellow);
     gameOverText.setOrigin(gameOverText.getLocalBounds().width / 2, gameOverText.getLocalBounds().height / 2);
-    gameOverText.setPosition(WINDOW_WIDTH / 2, 400);
+    gameOverText.setPosition(WINDOW_WIDTH / 2, 300);
     // Leaderboard
+    panelLeaderboard = sf::RectangleShape(sf::Vector2f(WINDOW_WIDTH * 0.8, WINDOW_HEIGHT * 0.42));
+    panelLeaderboard.setOutlineThickness(1.f);
+    panelLeaderboard.setOutlineColor(sf::Color::Yellow);
+    panelLeaderboard.setFillColor(sf::Color::Black);
+    panelLeaderboard.setPosition(WINDOW_WIDTH * 0.1, 350);
     leaderboardText.setFont(font);
     leaderboardText.setCharacterSize(FONT_SIZE);
     leaderboardText.setFillColor(sf::Color::Yellow);
     leaderboardText.setOutlineThickness(1.f);
     leaderboardText.setOutlineColor(sf::Color::Black);
     leaderboardText.setOrigin(leaderboardText.getLocalBounds().width / 2, leaderboardText.getLocalBounds().height / 2);
-    leaderboardText.setPosition(WINDOW_WIDTH / 5, 500);
+    leaderboardText.setPosition(WINDOW_WIDTH * 0.2, 400);
     reset();
 };
 
@@ -224,6 +229,7 @@ void Game::render()
     if (gameOver)
     {
         draw(gameOverText);
+        draw(panelLeaderboard);
         draw(leaderboardText);
     }
 
@@ -288,3 +294,4 @@ void Game::onKeyPress(const sf::Event &event)
 }
 
 Game::~Game() {}
+#endif

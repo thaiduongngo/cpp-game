@@ -65,12 +65,13 @@ namespace game
         highScore.setOrigin(playerName.getLocalBounds().width / 2, playerName.getLocalBounds().height / 2);
         highScore.setPosition(WINDOW_WIDTH * 0.15, 640);
         // Player name
+        playerString = "";
         playerName.setFont(font);
         playerName.setCharacterSize(CHAR_SIZE_DETAIL);
         playerName.setFillColor(sf::Color::White);
         playerName.setOutlineThickness(1.f);
         playerName.setOutlineColor(sf::Color::Blue);
-        playerName.setStyle(sf::Text::Bold);
+        playerName.setStyle(sf::Text::Bold | sf::Text::Italic);
         playerName.setOrigin(playerName.getLocalBounds().width / 2, playerName.getLocalBounds().height / 2);
         playerName.setPosition(WINDOW_WIDTH * 0.57, 640);
         reset();
@@ -79,8 +80,6 @@ namespace game
     void Game::reset()
     {
         score = 0;
-        pipeSpawnTimer = 0;
-        cloudSpawnTimer = 0;
         ctrChar.reset();
         scoreText.setString(std::format("Score: {}", score));
         pipes.reset();
@@ -97,24 +96,14 @@ namespace game
             ctrChar.moveAndFall(gravity, deltaTime);
 
             // Cloud spawning
-            cloudSpawnTimer += deltaTime;
-            if (cloudSpawnTimer >= CLOUD_SPAWN_INTERVAL)
-            {
-                cloudSpawnTimer = 0;
-                clouds.spawnCloud(WINDOW_WIDTH, static_cast<int>(WINDOW_HEIGHT));
-            }
+            clouds.spawnCloud(WINDOW_WIDTH, static_cast<int>(WINDOW_HEIGHT), deltaTime);
 
             // Move clouds
             clouds.moveCloud(deltaTime);
             clouds.eraseOffScreenCloud();
 
             // Pipe spawning
-            pipeSpawnTimer += deltaTime;
-            if (pipeSpawnTimer >= PIPE_SPAWN_INTERVAL)
-            {
-                pipeSpawnTimer = 0;
-                pipes.spawnPipe(WINDOW_WIDTH, static_cast<int>(WINDOW_HEIGHT * 2 / 3));
-            }
+            pipes.spawnPipe(WINDOW_WIDTH, static_cast<int>(WINDOW_HEIGHT * 0.66), deltaTime);
 
             // Move pipes
             pipes.movePipes(deltaTime);
@@ -208,11 +197,14 @@ namespace game
             case sf::Keyboard::Enter:
                 if (gameState == GameState::TOP_GAMEOVER)
                 {
-                    leaderboard.addEntry(playerString, score);
-                    leaderboardText.setString(leaderboard.getLeaderboard());
-                    playerString = "";
-                    playerName.setString(playerString);
-                    gameState = GameState::GAMEOVER;
+                    if (playerString.getSize() > 0)
+                    {
+                        leaderboard.addEntry(playerString, score);
+                        leaderboardText.setString(leaderboard.getLeaderboard());
+                        playerString = "";
+                        playerName.setString(playerString);
+                        gameState = GameState::GAMEOVER;
+                    }
                 }
                 else if (gameState != GameState::PLAYING)
                 {
@@ -229,7 +221,8 @@ namespace game
 
     void Game::onTextEntered(const sf::Event &event)
     {
-        if (event.type == sf::Event::TextEntered)
+        const auto chr_ = std::find(BANNED_CHARS.begin(), BANNED_CHARS.end(), event.text.unicode);
+        if (event.type == sf::Event::TextEntered && chr_ == BANNED_CHARS.end())
         {
             if (event.text.unicode == '\b')
             {
@@ -276,7 +269,7 @@ namespace game
         draw(ctrChar);
         draw(scoreText);
 
-        if (gameState != GameState::PLAYING)
+        if (gameState == GameState::GAMEOVER || gameState == GameState::NOT_STARTED)
         {
             draw(startText);
         }

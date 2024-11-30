@@ -17,6 +17,7 @@ namespace game::pipes
     constexpr auto PIPE_MAX_HEIGHT = 660.f;
     constexpr auto PIPE_GAP = 270.f;
     constexpr auto PIPE_SPEED = -220.f;
+    constexpr auto PIPE_SPAWN_INTERVAL = 1.75f;
     constexpr auto PIPE_IMAGE = "./res/stripes.png";
 
     typedef Pipe Pipe_t;
@@ -28,10 +29,11 @@ namespace game::pipes
     private:
         Pipes_t pipes_;
         sf::Texture texture_;
+        float pipeSpawnTimer = 0.f;
 
     public:
         Pipes();
-        void spawnPipe(const float &start, const int &range);
+        void spawnPipe(const float &start, const int &range, const float &deltaTime);
         void movePipes(const float &deltaTime);
         const Pipes_t &getPipes() const;
         const float getPipeSpeed() const;

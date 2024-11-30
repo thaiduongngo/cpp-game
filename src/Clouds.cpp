@@ -9,12 +9,17 @@ namespace game::cloud
         texture_.setSmooth(true);
     }
 
-    void Clouds::spawnCloud(const float &start, const int &height)
+    void Clouds::spawnCloud(const float &start, const int &height, const float &deltaTime)
     {
-        const float yPosition = static_cast<float>(abs(std::rand()) % height); // Randomize cloud position
-        auto cloud = Cloud(texture_);
-        cloud.setPosition(start, yPosition);
-        clouds.push_back(std::move(cloud));
+        cloudSpawnTimer += deltaTime;
+        if (cloudSpawnTimer >= CLOUD_SPAWN_INTERVAL)
+        {
+            cloudSpawnTimer = 0.f;
+            const float yPosition = static_cast<float>(abs(std::rand()) % height); // Randomize cloud position
+            auto cloud = Cloud(texture_);
+            cloud.setPosition(start, yPosition);
+            clouds.push_back(std::move(cloud));
+        }
     }
 
     void Clouds::moveCloud(const float &deltaTime)
@@ -49,6 +54,7 @@ namespace game::cloud
 
     void Clouds::reset()
     {
+        cloudSpawnTimer = 0.f;
         clouds.clear();
         clouds = Clouds_t(std::move(clouds));
     }

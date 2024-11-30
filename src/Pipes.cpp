@@ -4,20 +4,25 @@ namespace game::pipes
 {
     Pipes::Pipes() : pipes_()
     {
-    }
-
-    void Pipes::spawnPipe(const float &start, const int &range)
-    {
         texture_.loadFromFile(PIPE_IMAGE);
         texture_.setSmooth(true);
         texture_.setRepeated(true);
-        const auto vecPipe = sf::Vector2f(PIPE_MAX_WIDTH, PIPE_MAX_HEIGHT);
-        const float yPosition = static_cast<float>(abs(std::rand()) % range); // Randomize pipe position
-        auto pipeUp = Pipe_t(vecPipe, texture_);
-        auto pipeDown = Pipe_t(vecPipe, texture_);
-        pipeUp.setPosition(start, yPosition - PIPE_MAX_HEIGHT);
-        pipeDown.setPosition(start, yPosition + PIPE_GAP);
-        pipes_.push_back(std::move(PairPipe_t(pipeUp, pipeDown)));
+    }
+
+    void Pipes::spawnPipe(const float &start, const int &range, const float &deltaTime)
+    {
+        pipeSpawnTimer += deltaTime;
+        if (pipeSpawnTimer >= PIPE_SPAWN_INTERVAL)
+        {
+            pipeSpawnTimer = 0.f;
+            const auto vecPipe = sf::Vector2f(PIPE_MAX_WIDTH, PIPE_MAX_HEIGHT);
+            const float yPosition = static_cast<float>(abs(std::rand()) % range); // Randomize pipe position
+            auto pipeUp = Pipe_t(vecPipe, texture_);
+            auto pipeDown = Pipe_t(vecPipe, texture_);
+            pipeUp.setPosition(start, yPosition - PIPE_MAX_HEIGHT);
+            pipeDown.setPosition(start, yPosition + PIPE_GAP);
+            pipes_.push_back(std::move(PairPipe_t(pipeUp, pipeDown)));
+        }
     }
 
     void Pipes::movePipes(const float &deltaTime)
@@ -55,6 +60,7 @@ namespace game::pipes
 
     void Pipes::reset()
     {
+        pipeSpawnTimer = 0.f;
         pipes_.clear();
         pipes_ = Pipes_t(std::move(pipes_));
     }

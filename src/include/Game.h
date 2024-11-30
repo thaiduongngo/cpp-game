@@ -29,12 +29,11 @@ namespace game
     constexpr auto CHAR_SIZE_HEADER = 35;
     constexpr auto CHAR_SIZE_DETAIL = 25;
     constexpr auto FPS_LIMIT = 60;
-    constexpr auto PIPE_SPAWN_INTERVAL = 1.75f;
-    constexpr auto CLOUD_SPAWN_INTERVAL = 1.5f;
 
     class Game : public sf::RenderWindow
     {
     private:
+        const std::set<char> BANNED_CHARS = {'\n', ' '};
         game::character::CtrChar ctrChar;
         game::pipes::Pipes pipes;
         game::cloud::Clouds clouds;
@@ -57,8 +56,6 @@ namespace game
         GameState gameState = GameState::NOT_STARTED;
         int score = 0;
         float gravity = 981.f; // Acceleration due to gravity (pixels/s^2)
-        float pipeSpawnTimer = 0.f;
-        float cloudSpawnTimer = 0.f;
         void gamePlay();
         void render();
 

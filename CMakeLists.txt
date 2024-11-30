@@ -6,13 +6,25 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 find_package(SFML 2.6 COMPONENTS graphics window system network audio REQUIRED)
 
-include_directories(
-    "src/include"
+set(SOURCES
+    src/main.cpp
+    src/Leaderboard.cpp
+    src/Pipe.cpp
+    src/Pipes.cpp
+    src/Cloud.cpp
+    src/Clouds.cpp
+    src/CtrChar.cpp
+    src/Game.cpp
 )
 
 add_executable(
     ${PROJECT_NAME} 
-    src/main.cpp
+    ${SOURCES}
+)
+
+target_include_directories(
+    ${PROJECT_NAME} PUBLIC 
+    "src/include"
 )
 
 target_link_libraries(

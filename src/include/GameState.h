@@ -1,12 +1,11 @@
 #pragma once
-#ifndef _GAME_STATE_H_
-#define _GAME_STATE_H_
-
-enum GameState
+namespace game
 {
-    NOT_STARTED,
-    PLAYING,
-    TOP_GAMEOVER,
-    GAMEOVER
-};
-#endif
+    enum GameState
+    {
+        NOT_STARTED,
+        PLAYING,
+        TOP_GAMEOVER,
+        GAMEOVER
+    };
+}

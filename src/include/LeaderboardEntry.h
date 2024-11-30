@@ -2,14 +2,17 @@
 #include <time.h>
 #include <string>
 
-struct LeaderboardEntry
+namespace game::lb
 {
-    std::string name;
-    time_t timestamp;
-    int score;
-
-    bool operator<(const LeaderboardEntry &anotherEntry) const
+    struct LeaderboardEntry
     {
-        return score > anotherEntry.score;
-    }
-};
+        std::string name;
+        time_t timestamp;
+        int score;
+
+        bool operator<(const LeaderboardEntry &anotherEntry) const
+        {
+            return score > anotherEntry.score;
+        }
+    };
+}

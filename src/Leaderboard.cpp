@@ -14,7 +14,6 @@ namespace game::lb
         if (file.is_open())
         {
             entries_.clear();
-            entries_.shrink_to_fit();
             std::string line;
             while (std::getline(file, line))
             {

@@ -2,9 +2,9 @@
 
 namespace game::cloud
 {
-    Clouds::Clouds() : clouds()
+    Clouds::Clouds() : clouds_()
     {
-        clouds.reserve(CLOUD_RESERVED);
+        clouds_.reserve(CLOUD_RESERVED);
         // @todo handle error no file found here
         texture_.loadFromFile(CLOUD_IMAGE);
         texture_.setSmooth(true);
@@ -16,36 +16,37 @@ namespace game::cloud
         if (cloudSpawnTimer >= CLOUD_SPAWN_INTERVAL)
         {
             cloudSpawnTimer = 0.f;
-            const float yPosition = static_cast<float>(abs(std::rand()) % height); // Randomize cloud position
-            clouds.emplace_back(Cloud(texture_, start, yPosition));
+            std::srand(std::time(nullptr));
+            const float yPosition = static_cast<float>(std::rand() % height); // Randomize cloud position
+            clouds_.emplace_back(std::make_unique<Cloud>(texture_, start, yPosition));
         }
     }
 
     void Clouds::moveCloud(const float &deltaTime)
     {
-        for (auto &cloud : clouds)
+        for (auto &cloud : clouds_)
         {
-            cloud.move(CLOUD_SPEED * deltaTime, 0);
+            cloud->move(CLOUD_SPEED * deltaTime, 0);
         }
     }
 
     const Clouds_t &Clouds::getClouds() const
     {
-        return clouds;
+        return clouds_;
     }
 
     const bool Clouds::offScreen(const size_t &i) const
     {
-        return clouds[i].getPosition().x + clouds[i].getTextureRect().getSize().x < 0;
+        return clouds_[i]->getPosition().x + clouds_[i]->getTextureRect().getSize().x < 0;
     }
 
     void Clouds::eraseOffScreenCloud()
     {
-        for (int i = 0; i < clouds.size(); i++)
+        for (int i = 0; i < clouds_.size(); i++)
         {
             if (offScreen(i))
             {
-                clouds.erase(clouds.begin() + i);
+                clouds_.erase(clouds_.begin() + i);
             }
         }
     }
@@ -53,8 +54,8 @@ namespace game::cloud
     void Clouds::reset()
     {
         cloudSpawnTimer = 0.f;
-        clouds.clear();
-        clouds.shrink_to_fit();
+        clouds_.clear();
+        Clouds_t().swap(clouds_);
     }
 
     Clouds::~Clouds() {}

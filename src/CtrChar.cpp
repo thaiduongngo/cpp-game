@@ -32,15 +32,15 @@ namespace game::character
         return getPosition().y < bottom || (getPosition().y + size.y > top);
     }
 
-    const bool CtrChar::collidedWPipe(const game::pipes::PairPipe_t &pipe) const
+    const bool CtrChar::collidedWPipe(const game::pipes::PairPipes &pipe) const
     {
-        return getGlobalBounds().intersects(pipe.first.getGlobalBounds()) ||
-               getGlobalBounds().intersects(pipe.second.getGlobalBounds());
+        return getGlobalBounds().intersects(pipe.top->getGlobalBounds()) ||
+               getGlobalBounds().intersects(pipe.bottom->getGlobalBounds());
     }
 
-    const bool CtrChar::passedPipe(const game::pipes::PairPipe_t &pipe, const float &pipeSpeed, const float &deltaTime) const
+    const bool CtrChar::passedPipe(const game::pipes::PairPipes &pipe, const float &pipeSpeed, const float &deltaTime) const
     {
-        return pipe.first.getPosition().x + pipe.first.getSize().x < getPosition().x && pipe.first.getPosition().x + pipe.first.getSize().x > getPosition().x + pipeSpeed * deltaTime;
+        return pipe.top->getPosition().x + pipe.top->getSize().x < getPosition().x && pipe.top->getPosition().x + pipe.top->getSize().x > getPosition().x + pipeSpeed * deltaTime;
     }
 
     void CtrChar::moveToOriginalPosition()

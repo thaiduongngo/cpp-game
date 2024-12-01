@@ -22,8 +22,14 @@ namespace game::pipes
     constexpr auto PIPE_RESERVED = 5;
 
     typedef Pipe Pipe_t;
-    typedef std::pair<Pipe_t, Pipe_t> PairPipe_t;
-    typedef std::vector<PairPipe_t> Pipes_t;
+
+    struct PairPipes
+    {
+        std::unique_ptr<Pipe_t> top;
+        std::unique_ptr<Pipe_t> bottom;
+    };
+
+    typedef std::vector<PairPipes> Pipes_t;
 
     class Pipes
     {

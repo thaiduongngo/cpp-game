@@ -9,12 +9,12 @@ namespace game::cloud
     constexpr auto CLOUD_IMAGE = "./res/cloud.png";
     constexpr auto CLOUD_RESERVED = 12;
 
-    typedef std::vector<Cloud> Clouds_t;
+    typedef std::vector<std::unique_ptr<Cloud>> Clouds_t;
 
     class Clouds
     {
     private:
-        Clouds_t clouds;
+        Clouds_t clouds_;
         sf::Texture texture_;
         float cloudSpawnTimer = 0.f;
 

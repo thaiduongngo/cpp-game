@@ -25,8 +25,8 @@ namespace game::character
         void jump();
         void moveAndFall(const float &gravity, const float &deltaTime);
         const bool collidedWEdge(const float &top, const float &bottom) const;
-        const bool collidedWPipe(const game::pipes::PairPipe_t &pipe) const;
-        const bool passedPipe(const game::pipes::PairPipe_t &pipe, const float &pipeSpeed, const float &deltaTime) const;
+        const bool collidedWPipe(const game::pipes::PairPipes &pipe) const;
+        const bool passedPipe(const game::pipes::PairPipes &pipe, const float &pipeSpeed, const float &deltaTime) const;
         void reset();
         ~CtrChar();
     };

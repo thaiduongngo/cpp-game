@@ -16,13 +16,13 @@ namespace game::pipes
         if (pipeSpawnTimer >= PIPE_SPAWN_INTERVAL)
         {
             pipeSpawnTimer = 0.f;
+            std::srand(std::time(nullptr));
             const auto vecPipe = sf::Vector2f(PIPE_MAX_WIDTH, PIPE_MAX_HEIGHT);
-            const float yPosition = static_cast<float>(abs(std::rand()) % range); // Randomize pipe position
-            auto pipeUp = Pipe_t(vecPipe, texture_);
-            auto pipeDown = Pipe_t(vecPipe, texture_);
-            pipeUp.setPosition(start, yPosition - PIPE_MAX_HEIGHT);
-            pipeDown.setPosition(start, yPosition + PIPE_GAP);
-            pipes_.emplace_back(PairPipe_t(pipeUp, pipeDown));
+            const float yPosition = static_cast<float>(std::rand() % range); // Randomize pipe position
+
+            pipes_.emplace_back(PairPipes(
+                std::make_unique<Pipe_t>(vecPipe, texture_, start, yPosition - PIPE_MAX_HEIGHT),
+                std::make_unique<Pipe_t>(vecPipe, texture_, start, yPosition + PIPE_GAP)));
         }
     }
 
@@ -30,8 +30,8 @@ namespace game::pipes
     {
         for (auto &pipe : pipes_)
         {
-            pipe.first.move(PIPE_SPEED * deltaTime, 0);
-            pipe.second.move(PIPE_SPEED * deltaTime, 0);
+            pipe.top->move(PIPE_SPEED * deltaTime, 0);
+            pipe.bottom->move(PIPE_SPEED * deltaTime, 0);
         }
     }
 
@@ -47,7 +47,7 @@ namespace game::pipes
 
     const bool Pipes::offScreen(const size_t &i) const
     {
-        return pipes_[i].first.getPosition().x + pipes_[i].first.getTextureRect().getSize().x < 0;
+        return pipes_[i].top->getPosition().x + pipes_[i].top->getTextureRect().getSize().x < 0;
     }
 
     void Pipes::eraseOffScreenPipe(const size_t &i)
@@ -62,7 +62,7 @@ namespace game::pipes
     {
         pipeSpawnTimer = 0.f;
         pipes_.clear();
-        pipes_.shrink_to_fit();
+        Pipes_t().swap(pipes_);
     }
 
     Pipes::~Pipes() {}

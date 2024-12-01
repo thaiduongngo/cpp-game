@@ -255,15 +255,15 @@ namespace game
 
         draw(wnd_background, 4, sf::PrimitiveType::Quads);
 
-        for (const auto &cloud : clouds.getClouds())
+        for (const auto &cloud_ : clouds.getClouds())
         {
-            draw(cloud);
+            draw(*cloud_);
         }
 
-        for (const auto &pipePair : pipes.getPipes())
+        for (const auto &pairPipes_ : pipes.getPipes())
         {
-            draw((pipePair).first);
-            draw((pipePair).second);
+            draw(*pairPipes_.top);
+            draw(*pairPipes_.bottom);
         }
 
         draw(ctrChar);

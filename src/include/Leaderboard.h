@@ -10,10 +10,13 @@
 #include <iomanip>
 #include "LeaderboardEntry.h"
 
+#ifndef LEADERBOARD_SIZE
+#define LEADERBOARD_SIZE 5
+#endif
+
 namespace game::lb
 {
     constexpr std::string LEADERBOARD_FILE = "leaderboard.dat";
-    constexpr auto LEADERBOARD_SIZE = 5;
     constexpr char DELIMITER = ',';
     constexpr int STRING_MAX_LENGTH = 6;
 

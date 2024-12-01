@@ -7,6 +7,7 @@ namespace game::cloud
     constexpr auto CLOUD_SPEED = -100.f;
     constexpr auto CLOUD_SPAWN_INTERVAL = 1.5f;
     constexpr auto CLOUD_IMAGE = "./res/cloud.png";
+    constexpr auto CLOUD_RESERVED = 12;
 
     typedef std::vector<Cloud> Clouds_t;
 

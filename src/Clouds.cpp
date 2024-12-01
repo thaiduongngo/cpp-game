@@ -4,6 +4,7 @@ namespace game::cloud
 {
     Clouds::Clouds() : clouds()
     {
+        clouds.reserve(CLOUD_RESERVED);
         // @todo handle error no file found here
         texture_.loadFromFile(CLOUD_IMAGE);
         texture_.setSmooth(true);
@@ -16,9 +17,7 @@ namespace game::cloud
         {
             cloudSpawnTimer = 0.f;
             const float yPosition = static_cast<float>(abs(std::rand()) % height); // Randomize cloud position
-            auto cloud = Cloud(texture_);
-            cloud.setPosition(start, yPosition);
-            clouds.push_back(std::move(cloud));
+            clouds.emplace_back(Cloud(texture_, start, yPosition));
         }
     }
 
@@ -47,7 +46,6 @@ namespace game::cloud
             if (offScreen(i))
             {
                 clouds.erase(clouds.begin() + i);
-                clouds = Clouds_t(std::move(clouds));
             }
         }
     }
@@ -56,7 +54,7 @@ namespace game::cloud
     {
         cloudSpawnTimer = 0.f;
         clouds.clear();
-        clouds = Clouds_t(std::move(clouds));
+        clouds.shrink_to_fit();
     }
 
     Clouds::~Clouds() {}

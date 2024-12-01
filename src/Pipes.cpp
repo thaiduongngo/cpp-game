@@ -4,6 +4,7 @@ namespace game::pipes
 {
     Pipes::Pipes() : pipes_()
     {
+        pipes_.reserve(PIPE_RESERVED);
         texture_.loadFromFile(PIPE_IMAGE);
         texture_.setSmooth(true);
         texture_.setRepeated(true);
@@ -21,7 +22,7 @@ namespace game::pipes
             auto pipeDown = Pipe_t(vecPipe, texture_);
             pipeUp.setPosition(start, yPosition - PIPE_MAX_HEIGHT);
             pipeDown.setPosition(start, yPosition + PIPE_GAP);
-            pipes_.push_back(std::move(PairPipe_t(pipeUp, pipeDown)));
+            pipes_.emplace_back(PairPipe_t(pipeUp, pipeDown));
         }
     }
 
@@ -54,7 +55,6 @@ namespace game::pipes
         if (offScreen(i))
         {
             pipes_.erase(pipes_.begin() + i);
-            pipes_ = Pipes_t(std::move(pipes_));
         }
     }
 
@@ -62,7 +62,7 @@ namespace game::pipes
     {
         pipeSpawnTimer = 0.f;
         pipes_.clear();
-        pipes_ = Pipes_t(std::move(pipes_));
+        pipes_.shrink_to_fit();
     }
 
     Pipes::~Pipes() {}

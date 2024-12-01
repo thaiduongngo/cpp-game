@@ -7,6 +7,7 @@ namespace game::cloud
     {
     public:
         Cloud(const sf::Texture &texture);
+        Cloud(const sf::Texture &texture, const float &x, const float &y);
         ~Cloud();
     };
 }

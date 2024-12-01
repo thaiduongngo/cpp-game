@@ -19,6 +19,7 @@ namespace game::pipes
     constexpr auto PIPE_SPEED = -220.f;
     constexpr auto PIPE_SPAWN_INTERVAL = 1.75f;
     constexpr auto PIPE_IMAGE = "./res/stripes.png";
+    constexpr auto PIPE_RESERVED = 5;
 
     typedef Pipe Pipe_t;
     typedef std::pair<Pipe_t, Pipe_t> PairPipe_t;

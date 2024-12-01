@@ -4,6 +4,7 @@ namespace game::lb
 {
     Leaderboard::Leaderboard()
     {
+        entries_.reserve(LEADERBOARD_SIZE);
         loadFromFile();
     }
 
@@ -13,6 +14,7 @@ namespace game::lb
         if (file.is_open())
         {
             entries_.clear();
+            entries_.shrink_to_fit();
             std::string line;
             while (std::getline(file, line))
             {
@@ -26,7 +28,7 @@ namespace game::lb
                     {
                         time_t timestamp = std::stoll(timestampStr);
                         int score = std::stoi(scoreStr);
-                        entries_.push_back({name, timestamp, score});
+                        entries_.emplace_back(LeaderboardEntry(name, timestamp, score));
                     }
                     catch (const std::invalid_argument &e)
                     {
@@ -36,7 +38,6 @@ namespace game::lb
             }
             file.close();
             std::sort(entries_.begin(), entries_.end());
-            entries_ = std::vector<LeaderboardEntry>(std::move(entries_));
         }
     }
 
@@ -77,6 +78,7 @@ namespace game::lb
             if (entries_.size() > LEADERBOARD_SIZE)
             {
                 entries_.resize(LEADERBOARD_SIZE);
+                entries_.shrink_to_fit();
             }
             saveToFile();
         }

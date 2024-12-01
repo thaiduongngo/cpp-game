@@ -20,21 +20,20 @@ namespace game::lb
     constexpr char DELIMITER = ',';
     constexpr int STRING_MAX_LENGTH = 6;
 
+    typedef std::vector<LeaderboardEntry> Entries_t;
+
     class Leaderboard
     {
     private:
-        std::vector<LeaderboardEntry> entries_;
+        Entries_t entries_;
 
     public:
         Leaderboard();
-
         void loadFromFile();
         void saveToFile();
-        bool isTopScore(const int &score) const;
+        const bool isTopScore(const int &score) const;
         void addEntry(const std::string &name, const int &score);
         const std::string getLeaderboard() const;
-        std::vector<LeaderboardEntry> getEntries() const;
-
         ~Leaderboard();
     };
 }

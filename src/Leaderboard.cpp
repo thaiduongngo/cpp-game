@@ -13,7 +13,7 @@ namespace game::lb
         std::ifstream file(LEADERBOARD_FILE);
         if (file.is_open())
         {
-            entries_.clear();
+            Entries_t().swap(entries_);
             std::string line;
             while (std::getline(file, line))
             {
@@ -27,7 +27,8 @@ namespace game::lb
                     {
                         time_t timestamp = std::stoll(timestampStr);
                         int score = std::stoi(scoreStr);
-                        entries_.emplace_back(LeaderboardEntry(name, timestamp, score));
+                        entries_.emplace_back(
+                            LeaderboardEntry(name, timestamp, score));
                     }
                     catch (const std::invalid_argument &e)
                     {
@@ -47,7 +48,9 @@ namespace game::lb
         {
             for (const auto &entry : entries_)
             {
-                file << entry.name << DELIMITER << entry.timestamp << DELIMITER << entry.score << "\n";
+                file << entry.name << DELIMITER
+                     << entry.timestamp << DELIMITER
+                     << entry.score << "\n";
             }
             file.close();
         }
@@ -57,7 +60,7 @@ namespace game::lb
         }
     }
 
-    bool Leaderboard::isTopScore(const int &score) const
+    const bool Leaderboard::isTopScore(const int &score) const
     {
         if (entries_.size() < LEADERBOARD_SIZE)
         {
@@ -72,13 +75,14 @@ namespace game::lb
         {
             std::string name_ = name;
             name_.insert(name_.end(), STRING_MAX_LENGTH - name_.size(), ' ');
-            entries_.push_back({name_, std::time(0), score});
+            entries_.emplace_back(
+                LeaderboardEntry(name_, std::time(0), score));
             std::sort(entries_.begin(), entries_.end());
             if (entries_.size() > LEADERBOARD_SIZE)
             {
                 entries_.resize(LEADERBOARD_SIZE);
-                entries_.shrink_to_fit();
             }
+            Entries_t(entries_).swap(entries_);
             saveToFile();
         }
     }
@@ -98,11 +102,6 @@ namespace game::lb
             strLeaderboard += strRec;
         }
         return strLeaderboard;
-    }
-
-    std::vector<LeaderboardEntry> Leaderboard::getEntries() const
-    {
-        return entries_;
     }
 
     Leaderboard::~Leaderboard() {}

@@ -6,6 +6,7 @@ namespace game
                    ctrChar(),
                    pipes(),
                    clouds(),
+                   mounts(),
                    leaderboard()
     {
         this->setFramerateLimit(FPS_LIMIT);
@@ -84,6 +85,7 @@ namespace game
         scoreText.setString(std::format("Score: {}", score));
         pipes.reset();
         clouds.reset();
+        mounts.reset();
     }
 
     void Game::gamePlay()
@@ -97,10 +99,15 @@ namespace game
 
             // Cloud spawning
             clouds.spawnCloud(WINDOW_WIDTH, static_cast<int>(WINDOW_HEIGHT), deltaTime);
-
             // Move clouds
             clouds.moveCloud(deltaTime);
             clouds.eraseOffScreenCloud();
+
+            // Mount spawning
+            mounts.spawnMount(WINDOW_WIDTH, static_cast<int>(WINDOW_HEIGHT), deltaTime);
+            // Move mounts
+            mounts.moveMount(deltaTime);
+            mounts.eraseOffScreenMount();
 
             // Pipe spawning
             pipes.spawnPipe(WINDOW_WIDTH, static_cast<int>(WINDOW_HEIGHT * 0.66), deltaTime);
@@ -254,6 +261,11 @@ namespace game
         };
 
         draw(wnd_background, 4, sf::PrimitiveType::Quads);
+
+        for (const auto &mount_ : mounts.getMounts())
+        {
+            draw(*mount_);
+        }
 
         for (const auto &cloud_ : clouds.getClouds())
         {

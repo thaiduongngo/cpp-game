@@ -10,6 +10,7 @@
 #include "Pipes.h"
 #include "Cloud.h"
 #include "Clouds.h"
+#include "Mounts.h"
 #include "Leaderboard.h"
 #include "GameState.h"
 
@@ -37,6 +38,7 @@ namespace game
         game::character::CtrChar ctrChar;
         game::pipes::Pipes pipes;
         game::cloud::Clouds clouds;
+        game::mount::Mounts mounts;
         game::lb::Leaderboard leaderboard;
 
         sf::Font font;

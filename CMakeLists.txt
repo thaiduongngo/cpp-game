@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.31)
 
-project(DragonQuest LANGUAGES CXX VERSION 1.0.0)
-set(CMAKE_CXX_STANDARD 23)
+project(DragonQuest LANGUAGES CXX VERSION 1.0.1)
+set(CMAKE_CXX_STANDARD 26)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 find_package(SFML 2.6 COMPONENTS graphics window system network audio REQUIRED)
@@ -13,6 +13,8 @@ set(SOURCES
     src/Pipes.cpp
     src/Cloud.cpp
     src/Clouds.cpp
+    src/Mount.cpp
+    src/Mounts.cpp
     src/CtrChar.cpp
     src/Game.cpp
 )

@@ -20,7 +20,7 @@ namespace game::mount
         {
             mountSpawnTimer = 0.f;
             std::srand(std::time(nullptr));
-            const int i = (std::rand() % 3); // Randomize mount
+            const int i = (std::rand() % NUMBER_OF_MOUNTS); // Randomize mount
             mounts_.emplace_back(std::make_unique<Mount>(textures_[i], start, height - textures_[i].getSize().y));
         }
     }

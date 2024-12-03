@@ -8,7 +8,7 @@ namespace game::mount
 {
     constexpr auto MOUNT_SPEED = -95.f;
     constexpr auto MOUNT_SPAWN_INTERVAL = 5.5f;
-    constexpr size_t NUMBER_OF_MOUNTS = 3;
+    constexpr size_t NUMBER_OF_MOUNTS = 5;
 
     typedef std::vector<std::unique_ptr<Mount>> Mounts_t;
 
@@ -16,7 +16,7 @@ namespace game::mount
     {
     private:
         Mounts_t mounts_;
-        std::array<sf::Texture, 3> textures_;
+        std::array<sf::Texture, NUMBER_OF_MOUNTS> textures_;
         float mountSpawnTimer = 0.f;
 
     public:

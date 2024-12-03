@@ -27,7 +27,12 @@ cmake --build .
 # Run Program
 Go to `bin` directory, `cd bin`
 
-In MacOS, run
+In MacOS or Linux, run
 ```
 ./DragonQuest
+```
+
+In Windows, execute
+```
+DragonQuest.exe
 ```

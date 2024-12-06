@@ -1,6 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-#include "Mount.h"
+#include "DrawableObject.h"
 #include <format>
 #include <string>
 
@@ -10,7 +10,7 @@ namespace game::mount
     constexpr auto MOUNT_SPAWN_INTERVAL = 5.5f;
     constexpr size_t NUMBER_OF_MOUNTS = 5;
 
-    typedef std::vector<std::unique_ptr<Mount>> Mounts_t;
+    typedef std::vector<std::unique_ptr<game::common::DrawableObject>> Mounts_t;
 
     class Mounts
     {

@@ -2,7 +2,7 @@
 
 namespace game::character
 {
-    CtrChar::CtrChar()
+    CtrChar::CtrChar() : DrawableObject()
     {
         // @todo handle error no file found here
         texture_.loadFromFile(CHAR_IMAGE);

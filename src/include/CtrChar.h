@@ -2,6 +2,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "Pipes.h"
+#include "DrawableObject.h"
 
 #ifndef CHAR_ORG_POSITION
 #define CHAR_ORG_POSITION sf::Vector2f(100.f, 300.f)
@@ -12,7 +13,7 @@ namespace game::character
     constexpr auto JUPMP_DISTANCE = -400.f;
     constexpr auto CHAR_IMAGE = "./res/dragon.png";
 
-    class CtrChar : public sf::Sprite
+    class CtrChar : public game::common::DrawableObject
     {
     private:
         sf::Texture texture_;

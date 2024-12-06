@@ -1,4 +1,5 @@
 #include "Leaderboard.h"
+#include <iostream>
 
 namespace game::lb
 {
@@ -93,9 +94,17 @@ namespace game::lb
         for (size_t i = 0; i < entries_.size(); ++i)
         {
             const auto &entry = entries_[i];
-            char strBuffer[100];
-            std::strftime(strBuffer, sizeof(strBuffer), "%m-%d %H:%M:%S", std::localtime(&entry.timestamp));
+            const size_t BUFFER_SIZE = 80;
+            char *strBuffer = (char *)calloc(BUFFER_SIZE, sizeof(char *));
+            if (!strBuffer)
+            {
+                std::cerr << "Cannot allocate memory for a string buffer" << std::endl;
+                break;
+            }
+            std::strftime(strBuffer, BUFFER_SIZE, "%m-%d %H:%M:%S", std::localtime(&entry.timestamp));
             const std::string strTime(strBuffer);
+            free(strBuffer);
+            strBuffer = NULL;
             std::string strScore = std::to_string(entry.score);
             strScore.insert(strScore.begin(), STRING_MAX_LENGTH - strScore.size(), ' ');
             const std::string strRec = std::format("#{}  {}  {}  {}\n", i + 1, entry.name, strTime, strScore);

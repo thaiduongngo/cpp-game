@@ -1,6 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-#include "Cloud.h"
+#include "DrawableObject.h"
 
 namespace game::cloud
 {
@@ -9,7 +9,7 @@ namespace game::cloud
     constexpr auto CLOUD_IMAGE = "./res/cloud.png";
     constexpr auto CLOUD_RESERVED = 12;
 
-    typedef std::vector<std::unique_ptr<Cloud>> Clouds_t;
+    typedef std::vector<std::unique_ptr<game::common::DrawableObject>> Clouds_t;
 
     class Clouds
     {

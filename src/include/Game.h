@@ -8,7 +8,6 @@
 #include <iostream>
 #include "CtrChar.h"
 #include "Pipes.h"
-#include "Cloud.h"
 #include "Clouds.h"
 #include "Mounts.h"
 #include "Leaderboard.h"

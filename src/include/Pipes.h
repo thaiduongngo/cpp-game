@@ -1,7 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-#include <cmath>
-#include "Pipe.h"
+#include "DrawableObject.h"
 
 #ifndef PIPE_COLOR
 #define PIPE_COLOR sf::Color::Yellow
@@ -21,7 +20,7 @@ namespace game::pipes
     constexpr auto PIPE_IMAGE = "./res/stripes.png";
     constexpr auto PIPE_RESERVED = 5;
 
-    typedef Pipe Pipe_t;
+    typedef game::common::DrawableObject Pipe_t;
 
     struct PairPipes
     {

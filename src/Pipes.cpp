@@ -17,7 +17,7 @@ namespace game::pipes
         {
             pipeSpawnTimer = 0.f;
             std::srand(std::time(nullptr));
-            const auto vecPipe = sf::Vector2f(PIPE_MAX_WIDTH, PIPE_MAX_HEIGHT);
+            const auto vecPipe = sf::Vector2i(PIPE_MAX_WIDTH, PIPE_MAX_HEIGHT);
             const float yPosition = static_cast<float>(std::rand() % range); // Randomize pipe position
 
             pipes_.emplace_back(PairPipes(

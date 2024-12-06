@@ -18,7 +18,7 @@ namespace game::cloud
             cloudSpawnTimer = 0.f;
             std::srand(std::time(nullptr));
             const float yPosition = static_cast<float>(std::rand() % height); // Randomize cloud position
-            clouds_.emplace_back(std::make_unique<Cloud>(texture_, start, yPosition));
+            clouds_.emplace_back(std::make_unique<game::common::DrawableObject>(texture_, start, yPosition));
         }
     }
 

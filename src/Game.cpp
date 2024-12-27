@@ -4,8 +4,8 @@ namespace game
 {
     Game::Game() : RenderWindow(sf::VideoMode({WINDOW_WIDTH, WINDOW_HEIGHT}),
                                 GAME_TITLE),
-                   font("./res/FiraCode.ttf"),
-                   charTexture_("./res/dragon.png"),
+                   font(FONT_FILE),
+                   charTexture_(CHAR_IMAGE),
                    ctrChar(charTexture_),
                    pipes(),
                    clouds(),
@@ -17,9 +17,9 @@ namespace game
                    highScore(font),
                    playerName(font),
                    leaderboard(),
-                   flappingSoundBuffer("./res/dragon.mp3"),
+                   flappingSoundBuffer(FLAPPING_SOUND),
                    flappingSound(flappingSoundBuffer),
-                   gameOverSoundBuffer("./res/gameover.mp3"),
+                   gameOverSoundBuffer(GAMEOVER_SOUND),
                    gameOverSound(gameOverSoundBuffer)
     {
         this->setFramerateLimit(FPS_LIMIT);
@@ -108,20 +108,19 @@ namespace game
             ctrChar.moveAndFall(gravity, deltaTime);
 
             // Cloud spawning
-            clouds.spawnCloud(WINDOW_WIDTH, static_cast<int>(WINDOW_HEIGHT), deltaTime);
+            clouds.spawnCloud(WINDOW_WIDTH, WINDOW_HEIGHT, deltaTime);
             // Move clouds
             clouds.moveCloud(deltaTime);
             clouds.eraseOffScreenCloud();
-
             // Mount spawning
-            mounts.spawnMount(WINDOW_WIDTH, static_cast<int>(WINDOW_HEIGHT), deltaTime);
+            mounts.spawnMount(WINDOW_WIDTH, WINDOW_HEIGHT, deltaTime);
             // Move mounts
             mounts.moveMount(deltaTime);
             mounts.eraseOffScreenMount();
-
             // Pipe spawning
-            pipes.spawnPipe(WINDOW_WIDTH, static_cast<int>(WINDOW_HEIGHT * 0.66), deltaTime);
-
+            pipes.spawnPipe(WINDOW_WIDTH,
+                            static_cast<u_int>(WINDOW_HEIGHT * 0.66),
+                            deltaTime);
             // Move pipes
             pipes.movePipes(deltaTime);
 

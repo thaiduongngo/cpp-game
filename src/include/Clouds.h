@@ -4,10 +4,10 @@
 
 namespace game::cloud
 {
-    constexpr auto CLOUD_SPEED = -100.f;
-    constexpr auto CLOUD_SPAWN_INTERVAL = 1.5f;
-    constexpr auto CLOUD_IMAGE = "./res/cloud.png";
-    constexpr auto CLOUD_RESERVED = 12;
+    constexpr float CLOUD_SPEED = -100.f;
+    constexpr float CLOUD_SPAWN_INTERVAL = 1.5f;
+    constexpr std::string CLOUD_IMAGE = "./res/cloud.png";
+    constexpr size_t CLOUD_RESERVED = 12;
 
     using Clouds_t = std::vector<std::unique_ptr<game::common::DrawableObject>>;
 

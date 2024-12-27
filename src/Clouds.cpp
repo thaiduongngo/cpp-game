@@ -39,7 +39,7 @@ namespace game::cloud
 
     const bool Clouds::offScreen(const size_t &i) const
     {
-        return clouds_[i]->getPosition().x + clouds_[i]->getTexture().getSize().x < 0;
+        return clouds_[i]->getPosition().x + clouds_[i]->getSize().x < 0;
     }
 
     void Clouds::eraseOffScreenCloud()

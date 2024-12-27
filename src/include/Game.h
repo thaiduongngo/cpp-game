@@ -25,11 +25,15 @@
 namespace game
 {
     constexpr std::string GAME_TITLE = "Dragon Quest";
-    constexpr unsigned WINDOW_WIDTH = 1024;
-    constexpr unsigned WINDOW_HEIGHT = 768;
-    constexpr unsigned CHAR_SIZE_HEADER = 35;
-    constexpr unsigned CHAR_SIZE_DETAIL = 25;
-    constexpr unsigned FPS_LIMIT = 60;
+    constexpr u_int WINDOW_WIDTH = 1024;
+    constexpr u_int WINDOW_HEIGHT = 768;
+    constexpr u_int CHAR_SIZE_HEADER = 35;
+    constexpr u_int CHAR_SIZE_DETAIL = 25;
+    constexpr u_int FPS_LIMIT = 60;
+    constexpr std::string FONT_FILE = "./res/FiraCode.ttf";
+    constexpr std::string CHAR_IMAGE = "./res/dragon.png";
+    constexpr std::string FLAPPING_SOUND = "./res/dragon.mp3";
+    constexpr std::string GAMEOVER_SOUND = "./res/gameover.mp3";
 
     class Game : public sf::RenderWindow
     {
@@ -57,7 +61,7 @@ namespace game
         sf::SoundBuffer gameOverSoundBuffer;
         sf::Sound gameOverSound;
         GameState gameState = GameState::NOT_STARTED;
-        int score = 0;
+        u_int score = 0;
         float gravity = 981.f; // Acceleration due to gravity (pixels/s^2)
         void gamePlay();
         void render();

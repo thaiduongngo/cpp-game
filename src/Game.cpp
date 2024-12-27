@@ -261,8 +261,8 @@ namespace game
     void Game::render()
     {
         clear();
+        // Create window background with gradient color
         sf::VertexArray wnd_background(sf::PrimitiveType::TriangleStrip, 4);
-        // define it as a rectangle, located at (10, 10) and with size 100x100
         wnd_background[0].position = sf::Vector2f(0.f, 0.f);
         wnd_background[1].position = sf::Vector2f(0.f, WINDOW_HEIGHT);
         wnd_background[2].position = sf::Vector2f(WINDOW_WIDTH, 0.f);

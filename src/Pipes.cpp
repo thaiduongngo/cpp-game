@@ -2,14 +2,11 @@
 
 namespace game::pipes
 {
-    Pipes::Pipes() : pipes_()
+    Pipes::Pipes() : pipes_(), texture_(PIPE_IMAGE), pipeSpawnTimer(0.f)
     {
         pipes_.reserve(PIPE_RESERVED);
-        if (texture_.loadFromFile(PIPE_IMAGE))
-        {
-            texture_.setSmooth(true);
-            texture_.setRepeated(true);
-        }
+        texture_.setSmooth(true);
+        texture_.setRepeated(true);
     }
 
     void Pipes::spawnPipe(const float &start, const int &range, const float &deltaTime)

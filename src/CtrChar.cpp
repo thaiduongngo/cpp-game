@@ -4,7 +4,7 @@ namespace game::character
 {
     CtrChar::CtrChar(const sf::Texture &texture) : DrawableObject(texture)
     {
-        // setTexture(texture);
+        setPosition(CHAR_ORG_POSITION);
     }
 
     const float CtrChar::getVelocity() const

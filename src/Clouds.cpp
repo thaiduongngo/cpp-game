@@ -2,13 +2,9 @@
 
 namespace game::cloud
 {
-    Clouds::Clouds() : clouds_()
+    Clouds::Clouds() : clouds_(), texture_(CLOUD_IMAGE), cloudSpawnTimer(0.f)
     {
         clouds_.reserve(CLOUD_RESERVED);
-        if (texture_.loadFromFile(CLOUD_IMAGE))
-        {
-            // @todo handle error no file found here
-        }
         texture_.setSmooth(true);
     }
 

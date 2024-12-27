@@ -6,7 +6,7 @@ C++ compiler such as G++ must be installed in your computer.
 ## Install CMake
 https://cmake.org/download/
 ## Install SFML
-https://www.sfml-dev.org/tutorials/2.6/start-vc.php
+https://www.sfml-dev.org/tutorials/3.0/
 
 Or in MacOS, straightly install with brew
 ```

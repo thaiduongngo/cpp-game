@@ -9,7 +9,7 @@ namespace game::cloud
     constexpr auto CLOUD_IMAGE = "./res/cloud.png";
     constexpr auto CLOUD_RESERVED = 12;
 
-    typedef std::vector<std::unique_ptr<game::common::DrawableObject>> Clouds_t;
+    using Clouds_t = std::vector<std::unique_ptr<game::common::DrawableObject>>;
 
     class Clouds
     {

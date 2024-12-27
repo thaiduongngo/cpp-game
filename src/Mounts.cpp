@@ -7,9 +7,10 @@ namespace game::mount
         for (int i = 0; i < NUMBER_OF_MOUNTS; i++)
         {
             const std::string image_ = std::format("./res/Mount{}.png", i);
-            // @todo handle error no file found here
-            textures_[i].loadFromFile(image_);
-            textures_[i].setSmooth(true);
+            if (textures_[i].loadFromFile(image_))
+            {
+                textures_[i].setSmooth(true);
+            }
         }
     }
 
@@ -29,7 +30,7 @@ namespace game::mount
     {
         for (auto &mount : mounts_)
         {
-            mount->move(MOUNT_SPEED * deltaTime, 0);
+            mount->move(sf::Vector2f(MOUNT_SPEED * deltaTime, 0));
         }
     }
 
@@ -40,7 +41,7 @@ namespace game::mount
 
     const bool Mounts::offScreen(const size_t &i) const
     {
-        return mounts_[i]->getPosition().x + mounts_[i]->getTextureRect().getSize().x < 0;
+        return mounts_[i]->getPosition().x + mounts_[i]->getSize().x < 0;
     }
 
     void Mounts::eraseOffScreenMount()

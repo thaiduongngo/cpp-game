@@ -28,7 +28,7 @@ namespace game::pipes
         std::unique_ptr<Pipe_t> bottom;
     };
 
-    typedef std::vector<PairPipes> Pipes_t;
+    using Pipes_t = std::vector<PairPipes>;
 
     class Pipes
     {

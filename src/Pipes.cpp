@@ -5,9 +5,11 @@ namespace game::pipes
     Pipes::Pipes() : pipes_()
     {
         pipes_.reserve(PIPE_RESERVED);
-        texture_.loadFromFile(PIPE_IMAGE);
-        texture_.setSmooth(true);
-        texture_.setRepeated(true);
+        if (texture_.loadFromFile(PIPE_IMAGE))
+        {
+            texture_.setSmooth(true);
+            texture_.setRepeated(true);
+        }
     }
 
     void Pipes::spawnPipe(const float &start, const int &range, const float &deltaTime)
@@ -30,8 +32,8 @@ namespace game::pipes
     {
         for (auto &pipe : pipes_)
         {
-            pipe.top->move(PIPE_SPEED * deltaTime, 0);
-            pipe.bottom->move(PIPE_SPEED * deltaTime, 0);
+            pipe.top->move(sf::Vector2f(PIPE_SPEED * deltaTime, 0));
+            pipe.bottom->move(sf::Vector2f(PIPE_SPEED * deltaTime, 0));
         }
     }
 
@@ -47,7 +49,7 @@ namespace game::pipes
 
     const bool Pipes::offScreen(const size_t &i) const
     {
-        return pipes_[i].top->getPosition().x + pipes_[i].top->getTextureRect().getSize().x < 0;
+        return pipes_[i].top->getPosition().x + pipes_[i].top->getSize().x < 0;
     }
 
     void Pipes::eraseOffScreenPipe(const size_t &i)

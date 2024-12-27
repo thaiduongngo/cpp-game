@@ -2,12 +2,9 @@
 
 namespace game::character
 {
-    CtrChar::CtrChar() : DrawableObject()
+    CtrChar::CtrChar(const sf::Texture &texture) : DrawableObject(texture)
     {
-        // @todo handle error no file found here
-        texture_.loadFromFile(CHAR_IMAGE);
-        texture_.setSmooth(true);
-        setTexture(texture_);
+        // setTexture(texture);
     }
 
     const float CtrChar::getVelocity() const
@@ -23,19 +20,19 @@ namespace game::character
     void CtrChar::moveAndFall(const float &gravity, const float &deltaTime)
     {
         velocity += gravity * deltaTime;
-        move(0, velocity * deltaTime);
+        move(sf::Vector2f(0, velocity * deltaTime));
     }
 
     const bool CtrChar::collidedWEdge(const float &top, const float &bottom) const
     {
-        const sf::Vector2i size = getTextureRect().getSize();
+        const sf::Vector2u size = getSize();
         return getPosition().y < bottom || (getPosition().y + size.y > top);
     }
 
     const bool CtrChar::collidedWPipe(const game::pipes::PairPipes &pipe) const
     {
-        return getGlobalBounds().intersects(pipe.top->getGlobalBounds()) ||
-               getGlobalBounds().intersects(pipe.bottom->getGlobalBounds());
+        return getGlobalBounds().findIntersection(pipe.top->getGlobalBounds()) ||
+               getGlobalBounds().findIntersection(pipe.bottom->getGlobalBounds());
     }
 
     const bool CtrChar::passedPipe(const game::pipes::PairPipes &pipe, const float &pipeSpeed, const float &deltaTime) const

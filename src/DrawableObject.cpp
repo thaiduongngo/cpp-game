@@ -2,29 +2,31 @@
 
 namespace game::common
 {
-    DrawableObject::DrawableObject() {}
+    DrawableObject::DrawableObject(const sf::Texture &texture) : sf::Sprite(texture)
+    {
+    }
 
     DrawableObject::DrawableObject(
         const sf::Texture &texture,
-        const float &x, const float &y)
+        const float &x, const float &y) : sf::Sprite(texture)
     {
-        setTexture(texture);
-        setPosition(x, y);
+        setPosition(sf::Vector2f(x, y));
     }
 
     DrawableObject::DrawableObject(const sf::Vector2i &vec,
                                    const sf::Texture &texture,
                                    const float &x,
                                    const float &y)
+        : sf::Sprite(texture)
     {
-        setTexture(texture);
-        setTextureRect(sf::IntRect(0, 0, vec.x, vec.y));
-        setPosition(x, y);
+
+        setTextureRect(sf::IntRect(sf::Vector2i(0, 0), vec));
+        setPosition(sf::Vector2f(x, y));
     }
 
-    const sf::Vector2i DrawableObject::getSize() const
+    const sf::Vector2u DrawableObject::getSize() const
     {
-        return this->getTextureRect().getSize();
+        return this->getTexture().getSize();
     }
 
     DrawableObject::~DrawableObject() {}

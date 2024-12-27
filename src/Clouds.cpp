@@ -5,8 +5,10 @@ namespace game::cloud
     Clouds::Clouds() : clouds_()
     {
         clouds_.reserve(CLOUD_RESERVED);
-        // @todo handle error no file found here
-        texture_.loadFromFile(CLOUD_IMAGE);
+        if (texture_.loadFromFile(CLOUD_IMAGE))
+        {
+            // @todo handle error no file found here
+        }
         texture_.setSmooth(true);
     }
 
@@ -26,7 +28,7 @@ namespace game::cloud
     {
         for (auto &cloud : clouds_)
         {
-            cloud->move(CLOUD_SPEED * deltaTime, 0);
+            cloud->move(sf::Vector2f(CLOUD_SPEED * deltaTime, 0));
         }
     }
 
@@ -37,7 +39,7 @@ namespace game::cloud
 
     const bool Clouds::offScreen(const size_t &i) const
     {
-        return clouds_[i]->getPosition().x + clouds_[i]->getTextureRect().getSize().x < 0;
+        return clouds_[i]->getPosition().x + clouds_[i]->getTexture().getSize().x < 0;
     }
 
     void Clouds::eraseOffScreenCloud()

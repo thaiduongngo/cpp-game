@@ -10,7 +10,7 @@ namespace game::mount
     constexpr auto MOUNT_SPAWN_INTERVAL = 5.5f;
     constexpr size_t NUMBER_OF_MOUNTS = 5;
 
-    typedef std::vector<std::unique_ptr<game::common::DrawableObject>> Mounts_t;
+    using Mounts_t = std::vector<std::unique_ptr<game::common::DrawableObject>>;
 
     class Mounts
     {

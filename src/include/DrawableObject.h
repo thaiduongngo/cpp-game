@@ -6,7 +6,7 @@ namespace game::common
     class DrawableObject : public sf::Sprite
     {
     public:
-        DrawableObject();
+        DrawableObject(const sf::Texture &texture);
         DrawableObject(const sf::Texture &texture,
                        const float &x,
                        const float &y);
@@ -14,7 +14,7 @@ namespace game::common
                        const sf::Texture &texture,
                        const float &x,
                        const float &y);
-        const sf::Vector2i getSize() const;
+        const sf::Vector2u getSize() const;
         ~DrawableObject();
     };
 }

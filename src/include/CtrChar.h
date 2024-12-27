@@ -11,7 +11,6 @@
 namespace game::character
 {
     constexpr auto JUPMP_DISTANCE = -400.f;
-    constexpr auto CHAR_IMAGE = "./res/dragon.png";
 
     class CtrChar : public game::common::DrawableObject
     {
@@ -20,7 +19,7 @@ namespace game::character
         float velocity = 0.f;
 
     public:
-        CtrChar();
+        CtrChar(const sf::Texture &texture);
         const float getVelocity() const;
         void moveToOriginalPosition();
         void jump();

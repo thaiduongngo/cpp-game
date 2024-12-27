@@ -6,6 +6,7 @@
 #include <ctime>
 #include <format>
 #include <iostream>
+#include <set>
 #include "CtrChar.h"
 #include "Pipes.h"
 #include "Clouds.h"
@@ -24,16 +25,17 @@
 namespace game
 {
     constexpr std::string GAME_TITLE = "Dragon Quest";
-    constexpr auto WINDOW_WIDTH = 1024.f;
-    constexpr auto WINDOW_HEIGHT = 768.f;
-    constexpr auto CHAR_SIZE_HEADER = 35;
-    constexpr auto CHAR_SIZE_DETAIL = 25;
-    constexpr auto FPS_LIMIT = 60;
+    constexpr unsigned WINDOW_WIDTH = 1024;
+    constexpr unsigned WINDOW_HEIGHT = 768;
+    constexpr unsigned CHAR_SIZE_HEADER = 35;
+    constexpr unsigned CHAR_SIZE_DETAIL = 25;
+    constexpr unsigned FPS_LIMIT = 60;
 
     class Game : public sf::RenderWindow
     {
     private:
         const std::set<char> BANNED_CHARS = {'\n', ' '};
+        sf::Texture charTexture_;
         game::character::CtrChar ctrChar;
         game::pipes::Pipes pipes;
         game::cloud::Clouds clouds;
@@ -65,9 +67,9 @@ namespace game
         void reset();
         void run();
         // Events handling
-        void onClose(const sf::Event &event);
-        void onKeyPress(const sf::Event &event);
-        void onTextEntered(const sf::Event &event);
+        void onClose(const std::optional<sf::Event> &event);
+        void onKeyPress(const std::optional<sf::Event> &event);
+        void onTextEntered(const std::optional<sf::Event> &event);
         ~Game();
     };
 }
